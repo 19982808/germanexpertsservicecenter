@@ -135,7 +135,6 @@ window.addEventListener("load", () => {
     {title:"F87 M2 F22 2 Series Headlights (2014–2021)", price:"KSh 250,000", img:"product2.jpg"},
     {title:"Porsche Cayenne Air Suspension (2011–2017)", price:"KSh 370,000", img:"product3.jpg"},
     {title:"Porsche Cayenne Xenon Projector Headlights", price:"KSh 130,000", img:"product4.jpg"}
-    // Add more products as needed
   ];
 
   const brandsData = [
@@ -258,10 +257,11 @@ window.addEventListener("load", () => {
     setTimeout(()=>{ document.querySelectorAll(".dynamic-btn").forEach(btn=>btn.addEventListener("click",()=>handleAction(btn.dataset.action))); },100);
   }
 
-  /* ==================== BRAND CARD CLICK ==================== */
+  /* ==================== BRAND CARD CLICK FIXED ==================== */
   document.querySelectorAll(".brand-card").forEach(card => {
     card.addEventListener("click", () => {
-      const brandKey = card.dataset.brand;
+      const brandKey = card.dataset.brand; // make sure HTML has data-brand
+      if(!brandKey) return alert("Brand key not set in HTML!");
       const brand = brandsData.find(b => b.key === brandKey);
       if (brand && brand.page) {
         window.open(brand.page, "_blank");
