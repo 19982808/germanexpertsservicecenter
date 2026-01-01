@@ -78,40 +78,37 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Range Rover", img: "brands/range-rover.png", page: "range.html" }
   ];
 
-  const brandsSection = document.getElementById("specialization");
+  // Get the brands section
+  const brandsSection = document.getElementById("brands");
+
   if (!brandsSection) return;
 
   // Create grid container
   const brandsGrid = document.createElement("div");
   brandsGrid.className = "brands-grid";
 
+  // Generate each brand card
   brandsData.forEach(brand => {
     const card = document.createElement("div");
     card.className = "brand-card";
 
-    // Create clickable link around card
-    const link = document.createElement("a");
-    link.href = brand.page;
+    card.innerHTML = `
+      <img src="${brand.img}" alt="${brand.name} Logo">
+      <p>${brand.name}</p>
+    `;
 
-    // Brand image
-    const img = document.createElement("img");
-    img.src = brand.img;
-    img.alt = brand.name + " Logo";
-
-    // Brand name
-    const p = document.createElement("p");
-    p.textContent = brand.name;
-
-    // Append image & name to link, link to card
-    link.appendChild(img);
-    link.appendChild(p);
-    card.appendChild(link);
+    // Make the card clickable → opens the brand page
+    card.addEventListener("click", () => {
+      window.location.href = brand.page;
+    });
 
     brandsGrid.appendChild(card);
   });
 
+  // Append the grid to the brands section
   brandsSection.appendChild(brandsGrid);
 });
+
 
 
   /* ================= BOOKING → WHATSAPP ================= */
