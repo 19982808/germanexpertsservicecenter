@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Mercedes-Benz", img: "mercedes-benz.png", page: "mercedes.html" },
     { name: "Volkswagen", img: "volkswagen.png", page: "volkswagen.html" },
     { name: "Porsche", img: "porsche.png", page: "porsche.html" },
-    { name: "Range Rover", img: "range-rover.png", page: "range.html" }
+    { name: "Range Rover", img: "range-rover.png", page: "range-rover.html" }
   ];
 
   const brandsSection = document.getElementById("brands");
