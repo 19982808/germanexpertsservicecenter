@@ -73,32 +73,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const brandsData = [
     {
       name: "Audi",
-      img: "images/audi.png",
+      img: "audi.png",
       details: "Audi: Specializing in A1-A8 models, engine diagnostics, suspension, and ECU coding."
     },
     {
       name: "BMW",
-      img: "images/bmw.png",
+      img: "bmw.png",
       details: "BMW: Full-service BMW repairs, air suspension, M-series upgrades, diagnostics."
     },
     {
       name: "Mercedes-Benz",
-      img: "images/mercedes-benz.png",
+      img: "mercedes-benz.png",
       details: "Mercedes-Benz: Engine tuning, diagnostics, AMG & luxury series servicing."
     },
     {
       name: "Volkswagen",
-      img: "images/volkswagen.png",
+      img: "volkswagen.png",
       details: "Volkswagen: All VW models, full repairs, brakes, and service packages."
     },
     {
       name: "Porsche",
-      img: "images/porsche.png",
+      img: "porsche.png",
       details: "Porsche: Cayenne, Panamera, 911 – performance and luxury servicing."
     },
     {
       name: "Range Rover",
-      img: "images/range-rover.png",
+      img: "range-rover.png",
       details: "Range Rover: Suspension, diagnostics, software updates, and restoration."
     }
   ];
