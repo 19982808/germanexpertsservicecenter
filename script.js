@@ -1,210 +1,138 @@
-/* ===========================
-   GLOBAL HELPERS
-=========================== */
-function scrollToSection(id) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: "smooth" });
-}
+/* ==================================================
+   GERMAN EXPERTS CENTER – FULL WEBSITE SCRIPT
+   GitHub Pages SAFE
+================================================== */
 
-function addBotMessage(text) {
-  const box = document.getElementById("chatbot-messages");
-  if (!box) return;
-  const div = document.createElement("div");
-  div.className = "bot-message";
-  div.innerHTML = text;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-}
+document.addEventListener("DOMContentLoaded", () => {
 
-function addUserMessage(text) {
-  const box = document.getElementById("chatbot-messages");
-  if (!box) return;
-  const div = document.createElement("div");
-  div.className = "user-message";
-  div.textContent = text;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-}
+  /* ================= HAMBURGER ================= */
+  const burger = document.querySelector(".burger");
+  const nav = document.querySelector("header nav");
+  if (burger && nav) {
+    burger.addEventListener("click", () => {
+      nav.style.display = nav.style.display === "flex" ? "none" : "flex";
+    });
+  }
 
-/* ===========================
-   BRAND DATA
-=========================== */
-const brandsData = {
-  audi: { name: "Audi", page: "audi.html" },
-  bmw: { name: "BMW", page: "bmw.html" },
-  mercedes: { name: "Mercedes-Benz", page: "mercedes.html" },
-  volkswagen: { name: "Volkswagen", page: "volkswagen.html" },
-  porsche: { name: "Porsche", page: "porsche.html" },
-  range: { name: "Range Rover", page: "range.html" }
-};
+  /* ================= HERO SLIDER ================= */
+  let slides = document.querySelectorAll(".slide");
+  let dots = document.querySelectorAll(".dot");
+  let currentSlide = 0;
 
-/* ===========================
-   SERVICES DATA
-=========================== */
-const servicesData = [
-  "Diagnostics & Scanning",
-  "Major Engine Repairs",
-  "Transmission Services",
-  "Suspension & Steering",
-  "Brake System Repairs",
-  "Oil Change & Maintenance",
-  "Air Conditioning Service",
-  "Body Works & Paint"
-];
+  function showSlide(index) {
+    slides.forEach((s, i) => s.classList.toggle("active", i === index));
+    dots.forEach((d, i) => d.classList.toggle("active", i === index));
+  }
 
-/* ===========================
-   PRODUCTS DATA
-=========================== */
-const productsData = [
-  { name: "BMW X6 F16 Air Struts", price: "KSh 180,000" },
-  { name: "Audi A6 C7 Air Suspension", price: "KSh 200,000" },
-  { name: "Mercedes W212 Headlights", price: "KSh 150,000" },
-  { name: "Porsche Cayenne Air Suspension", price: "KSh 370,000" },
-  { name: "VW Golf Mk7 Suspension", price: "KSh 150,000" }
-];
+  if (slides.length) {
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }, 4000);
+  }
 
-/* ===========================
-   BRAND CLICK HANDLER
-=========================== */
-document.querySelectorAll(".brand-card").forEach(card => {
-  card.addEventListener("click", () => {
-    const key = card.dataset.brand;
-    if (!key || !brandsData[key]) {
-      alert("Brand page not available.");
+  /* ================= DATA ================= */
+
+  const servicesData = [
+    { title: "Minor & Major Engine Service", desc: "Complete engine servicing.", img: "images/service1.png" },
+    { title: "Diagnosis & Programming", desc: "Advanced diagnostics.", img: "images/service2.png" },
+    { title: "Transmission Services", desc: "Gearbox & transmission repairs.", img: "images/service3.png" },
+    { title: "Suspension Services", desc: "Smooth ride solutions.", img: "images/service4.png" },
+    { title: "Body Works & Paint", desc: "Professional body repairs.", img: "images/service5.png" },
+    { title: "Pre-Purchase Inspection", desc: "Full inspection reports.", img: "images/service6.png" },
+    { title: "Software Coding", desc: "ECU & module updates.", img: "images/service7.png" },
+    { title: "Key Duplication", desc: "Secure key cloning.", img: "images/service8.png" },
+    { title: "Interior Works", desc: "Interior restoration.", img: "images/service9.png" }
+  ];
+
+  const productsData = [
+    { title: "BMW X6 Air Struts", price: "KSh 180,000", img: "images/product1.png" },
+    { title: "BMW F22 Headlights", price: "KSh 250,000", img: "images/product2.png" },
+    { title: "Porsche Cayenne Air Suspension", price: "KSh 370,000", img: "images/product3.png" },
+    { title: "Porsche Xenon Headlights", price: "KSh 130,000", img: "images/product4.png" }
+  ];
+
+  const brands = {
+    audi: "audi.html",
+    bmw: "bmw.html",
+    mercedes: "mercedes.html",
+    volkswagen: "volkswagen.html",
+    porsche: "porsche.html",
+    range: "range.html"
+  };
+
+  /* ================= CHATBOT ================= */
+
+  const chatBox = document.getElementById("chatbot-container");
+  const chatToggle = document.getElementById("chatbot-toggle");
+  const chatClose = document.getElementById("chatbot-close");
+  const messages = document.getElementById("chatbot-messages");
+  const input = document.getElementById("chatbot-input");
+  const sendBtn = document.getElementById("chatbot-send");
+
+  if (chatToggle) chatToggle.onclick = () => chatBox.style.display = "flex";
+  if (chatClose) chatClose.onclick = () => chatBox.style.display = "none";
+
+  function botMsg(html) {
+    const div = document.createElement("div");
+    div.className = "message bot";
+    div.innerHTML = html;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function userMsg(text) {
+    const div = document.createElement("div");
+    div.className = "message user";
+    div.textContent = text;
+    messages.appendChild(div);
+  }
+
+  function handleMessage(text) {
+    const msg = text.toLowerCase();
+
+    if (msg.includes("hi") || msg.includes("hello")) {
+      botMsg("Hi 👋 How can I help you? Ask about <b>services</b>, <b>shop</b> or <b>brands</b>.");
       return;
     }
-    window.location.href = brandsData[key].page;
-  });
-});
 
-/* ===========================
-   CHATBOT TOGGLE
-=========================== */
-const toggle = document.getElementById("chatbot-toggle");
-const chatbot = document.getElementById("chatbot-container");
-const closeBtn = document.getElementById("chatbot-close");
+    if (msg.includes("service")) {
+      botMsg(servicesData.map(s =>
+        `<div><img src="${s.img}" width="60"><b>${s.title}</b><p>${s.desc}</p></div>`
+      ).join(""));
+      return;
+    }
 
-if (toggle && chatbot) {
-  toggle.onclick = () => chatbot.classList.toggle("open");
-}
-if (closeBtn) {
-  closeBtn.onclick = () => chatbot.classList.remove("open");
-}
+    if (msg.includes("shop") || msg.includes("product")) {
+      botMsg(productsData.map(p =>
+        `<div><img src="${p.img}" width="60"><b>${p.title}</b><p>${p.price}</p></div>`
+      ).join(""));
+      return;
+    }
 
-/* ===========================
-   CHATBOT CORE LOGIC
-=========================== */
-function processMessage(msg) {
-  const text = msg.toLowerCase();
-
-  // greetings
-  if (text.includes("hi") || text.includes("hello")) {
-    addBotMessage("Hello 👋 How may I help you today?");
-    return;
-  }
-
-  // services
-  if (text.includes("service")) {
-    let html = "<strong>Our Services:</strong><br>";
-    servicesData.forEach(s => html += "✔️ " + s + "<br>");
-    html += "<br><button onclick=\"scrollToSection('services')\">View Services</button>";
-    addBotMessage(html);
-    return;
-  }
-
-  // shop
-  if (text.includes("shop") || text.includes("product")) {
-    let html = "<strong>Available Products:</strong><br>";
-    productsData.forEach(p => {
-      html += `🛒 ${p.name} – <b>${p.price}</b><br>`;
+    Object.keys(brands).forEach(b => {
+      if (msg.includes(b)) {
+        botMsg(`View ${b.toUpperCase()} services 👉 <a href="${brands[b]}" target="_blank">Open Page</a>`);
+      }
     });
-    html += "<br><button onclick=\"scrollToSection('shop')\">Go to Shop</button>";
-    addBotMessage(html);
-    return;
   }
 
-  // booking
-  if (text.includes("book") || text.includes("appointment")) {
-    addBotMessage("You can book an appointment below 👇");
-    scrollToSection("booking");
-    return;
+  if (sendBtn) {
+    sendBtn.onclick = () => {
+      if (!input.value.trim()) return;
+      userMsg(input.value);
+      handleMessage(input.value);
+      input.value = "";
+    };
   }
 
-  // location
-  if (text.includes("location") || text.includes("where")) {
-    addBotMessage("📍 We are located at Ngong Road, Kiambu By-pass & Karen.");
-    scrollToSection("locations");
-    return;
-  }
+  /* ================= BRAND CLICK ================= */
 
-  // brands
-  if (text.includes("brand") || text.includes("audi") || text.includes("bmw")) {
-    let html = "<strong>We specialize in:</strong><br>";
-    Object.values(brandsData).forEach(b => {
-      html += `🚗 ${b.name}<br>`;
+  document.querySelectorAll(".brand-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const key = card.dataset.brand;
+      if (brands[key]) window.location.href = brands[key];
     });
-    html += "<br>Click a brand card below 👇";
-    addBotMessage(html);
-    scrollToSection("specialization");
-    return;
-  }
-
-  // fallback
-  addBotMessage(
-    "I'm not sure I understood 🤔<br>" +
-    "You can ask about:<br>" +
-    "• Services<br>• Shop / Products<br>• Booking<br>• Locations<br>• Brands"
-  );
-}
-
-/* ===========================
-   CHATBOT INPUT HANDLING
-=========================== */
-const input = document.getElementById("chatbot-input");
-const sendBtn = document.getElementById("chatbot-send");
-
-if (sendBtn && input) {
-  sendBtn.onclick = () => {
-    const msg = input.value.trim();
-    if (!msg) return;
-    addUserMessage(msg);
-    input.value = "";
-    setTimeout(() => processMessage(msg), 400);
-  };
-
-  input.addEventListener("keypress", e => {
-    if (e.key === "Enter") sendBtn.click();
   });
-}
 
-/* ===========================
-   CHATBOT QUICK OPTIONS
-=========================== */
-document.querySelectorAll("#chatbot-options button").forEach(btn => {
-  btn.onclick = () => {
-    const opt = btn.dataset.option;
-    addUserMessage(opt);
-    processMessage(opt);
-  };
 });
-
-/* ===========================
-   SLIDER (SAFE)
-=========================== */
-let slideIndex = 0;
-const slides = document.querySelectorAll(".slide");
-const dots = document.querySelectorAll(".dot");
-
-function showSlide(i) {
-  slides.forEach(s => s.classList.remove("active"));
-  dots.forEach(d => d.classList.remove("active"));
-  slideIndex = (i + slides.length) % slides.length;
-  if (slides[slideIndex]) slides[slideIndex].classList.add("active");
-  if (dots[slideIndex]) dots[slideIndex].classList.add("active");
-}
-
-document.querySelector(".next")?.addEventListener("click", () => showSlide(slideIndex + 1));
-document.querySelector(".prev")?.addEventListener("click", () => showSlide(slideIndex - 1));
-dots.forEach((dot, i) => dot.addEventListener("click", () => showSlide(i)));
-
-setInterval(() => showSlide(slideIndex + 1), 6000);
