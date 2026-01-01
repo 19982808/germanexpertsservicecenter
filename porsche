@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Porsche Service Center – Nairobi | German Experts Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Best Porsche Service Center in Nairobi. Professional diagnostics, repairs, and maintenance at German Experts Center.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a href="index.html">⬅ Back to Home</a>
+  <h1>Porsche Service Center – Nairobi</h1>
+  <p>Precision. Performance. Perfection. Trusted German Car Experts.</p>
+</header>
+<section id="about">
+  <h2>About Porsche Services</h2>
+  <p>At German Experts Center, we specialize in professional Porsche diagnostics, maintenance, and repairs. Our workshop ensures your Porsche retains peak performance and luxury.</p>
+</section>
+<section id="services">
+  <h2>Comprehensive Porsche Services</h2>
+  <ol>
+    <li><h3>Diagnostics & Scanning</h3><p>Advanced electronic diagnostics for all Porsche systems.</p></li>
+    <li><h3>Engine Repairs & Overhauls</h3><p>Full engine service using genuine Porsche parts.</p></li>
+    <li><h3>Brake & Suspension Repairs</h3><p>Ensuring maximum performance and ride comfort.</p></li>
+    <li><h3>Transmission Services</h3><p>Manual & automatic transmission repairs and fluid replacements.</p></li>
+    <li><h3>Oil Changes & Routine Maintenance</h3><p>Regular service to extend Porsche lifespan.</p></li>
+    <li><h3>Air Conditioning & Climate Control</h3><p>AC repair, gas refill, and compressor service.</p></li>
+  </ol>
+  <ul>
+    <li>Certified Porsche Technicians</li>
+    <li>Genuine Porsche Parts</li>
+    <li>Advanced Workshop Tools</li>
+    <li>Towing Services Available</li>
+    <li>Locations: Ngong Road & Karen</li>
+  </ul>
+</section>
+<section id="shop">
+  <h2>Porsche Products</h2>
+  <ul>
+    <li>Porsche Cayenne 2010-2017 Air Suspension / Struts – KSh 350,000–370,000</li>
+    <li>Porsche Panamera Headlights – KSh 180,000</li>
+  </ul>
+</section>
+<section id="contact">
+  <h2>Contact Us</h2>
+  <ul>
+    <li>Location: Ngong Road & Karen (Behind Shell Petrol Station)</li>
+    <li>Call Us: 0798 690 204</li>
+    <li>Email: <a href="mailto:Info@germanexpertscenter.co.ke">Info@germanexpertscenter.co.ke</a></li>
+  </ul>
+</section>
+<footer>
+  <p>© 2026 German Experts Center, All Rights Reserved.</p>
+  <p>Precision. Performance. Perfection. Trusted German Car Experts</p>
+  <p>Call Us At: 0798 690 204 | <a href="mailto:Info@germanexpertscenter.co.ke">Info@germanexpertscenter.co.ke</a></p>
+  <p>Visit us at: www.germanexpertscenter.co.ke</p>
+</footer>
+</body>
+</html>
