@@ -66,80 +66,45 @@ document.addEventListener("DOMContentLoaded", () => {
       reviews[reviewIndex].classList.add("active");
     }, 4000);
   }
-
 /* ================= DYNAMIC BRANDS SECTION ================= */
 document.addEventListener("DOMContentLoaded", () => {
 
   const brandsData = [
-    {
-      name: "Audi",
-      img: "audi.png",
-      details: "Audi: Specializing in A1-A8 models, engine diagnostics, suspension, and ECU coding."
-    },
-    {
-      name: "BMW",
-      img: "bmw.png",
-      details: "BMW: Full-service BMW repairs, air suspension, M-series upgrades, diagnostics."
-    },
-    {
-      name: "Mercedes-Benz",
-      img: "mercedes-benz.png",
-      details: "Mercedes-Benz: Engine tuning, diagnostics, AMG & luxury series servicing."
-    },
-    {
-      name: "Volkswagen",
-      img: "volkswagen.png",
-      details: "Volkswagen: All VW models, full repairs, brakes, and service packages."
-    },
-    {
-      name: "Porsche",
-      img: "porsche.png",
-      details: "Porsche: Cayenne, Panamera, 911 – performance and luxury servicing."
-    },
-    {
-      name: "Range Rover",
-      img: "range-rover.png",
-      details: "Range Rover: Suspension, diagnostics, software updates, and restoration."
-    }
+    { name: "Audi", img: "brands/audi.png", page: "audi.html" },
+    { name: "BMW", img: "brands/bmw.png", page: "bmw.html" },
+    { name: "Mercedes-Benz", img: "brands/mercedes-benz.png", page: "mercedes.html" },
+    { name: "Volkswagen", img: "brands/volkswagen.png", page: "volkswagen.html" },
+    { name: "Porsche", img: "brands/porsche.png", page: "porsche.html" },
+    { name: "Range Rover", img: "brands/range-rover.png", page: "range.html" }
   ];
 
-  // Get container elements
+  // Get container
   const brandsSection = document.getElementById("specialization");
   const brandsGrid = document.createElement("div");
   brandsGrid.className = "brands-grid";
-  const brandDetails = document.createElement("section");
-  brandDetails.id = "brand-details";
-  brandDetails.className = "brand-details";
 
   // Generate brand cards
-  brandsData.forEach((brand, index) => {
+  brandsData.forEach((brand) => {
     const card = document.createElement("div");
     card.className = "brand-card";
-    card.dataset.brand = brand.name.toLowerCase().replace(/\s+/g, "");
 
     card.innerHTML = `
       <img src="${brand.img}" alt="${brand.name} Logo">
       <p>${brand.name}</p>
     `;
 
-    // Click event
+    // Click opens the brand page
     card.addEventListener("click", () => {
-      // Highlight active
-      document.querySelectorAll(".brand-card").forEach(c => c.classList.remove("active"));
-      card.classList.add("active");
-
-      // Show brand details
-      brandDetails.innerHTML = `<p>${brand.details}</p>`;
-      brandDetails.scrollIntoView({ behavior: "smooth" });
+      window.location.href = brand.page;
     });
 
     brandsGrid.appendChild(card);
   });
 
-  // Append generated content to section
+  // Append to section
   brandsSection.appendChild(brandsGrid);
-  brandsSection.appendChild(brandDetails);
 });
+
 
   /* ================= BOOKING → WHATSAPP ================= */
   const bookingForm = document.getElementById("bookingForm");
