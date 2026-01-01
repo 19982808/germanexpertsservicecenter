@@ -1,58 +1,74 @@
-/* ==================================================
-   GERMAN EXPERTS CENTER – FULL WEBSITE SCRIPT
-   GitHub Pages SAFE
-================================================== */
+/* =========================================================
+   GERMAN EXPERTS SERVICE CENTER – FULL SCRIPT
+   MATCHES PROVIDED HTML 100%
+========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ================= HAMBURGER ================= */
+  /* ================= BURGER MENU ================= */
   const burger = document.querySelector(".burger");
   const nav = document.querySelector("header nav");
+
   if (burger && nav) {
     burger.addEventListener("click", () => {
-      nav.style.display = nav.style.display === "flex" ? "none" : "flex";
+      nav.classList.toggle("open");
     });
   }
 
   /* ================= HERO SLIDER ================= */
-  let slides = document.querySelectorAll(".slide");
-  let dots = document.querySelectorAll(".dot");
+  const slides = document.querySelectorAll(".slide");
+  const dots = document.querySelectorAll(".dot");
+  const prevBtn = document.querySelector(".prev");
+  const nextBtn = document.querySelector(".next");
   let currentSlide = 0;
 
   function showSlide(index) {
-    slides.forEach((s, i) => s.classList.toggle("active", i === index));
-    dots.forEach((d, i) => d.classList.toggle("active", i === index));
+    slides.forEach((slide, i) => {
+      slide.classList.toggle("active", i === index);
+    });
+    dots.forEach((dot, i) => {
+      dot.classList.toggle("active", i === index);
+    });
   }
 
-  if (slides.length) {
-    setInterval(() => {
-      currentSlide = (currentSlide + 1) % slides.length;
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+  }
+
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
+  }
+
+  if (nextBtn) nextBtn.addEventListener("click", nextSlide);
+  if (prevBtn) prevBtn.addEventListener("click", prevSlide);
+
+  dots.forEach(dot => {
+    dot.addEventListener("click", () => {
+      currentSlide = Number(dot.dataset.index);
       showSlide(currentSlide);
+    });
+  });
+
+  if (slides.length > 0) {
+    setInterval(nextSlide, 5000);
+  }
+
+  /* ================= REVIEWS ROTATION ================= */
+  const reviews = document.querySelectorAll(".review");
+  let reviewIndex = 0;
+
+  if (reviews.length > 0) {
+    setInterval(() => {
+      reviews.forEach(r => r.classList.remove("active"));
+      reviewIndex = (reviewIndex + 1) % reviews.length;
+      reviews[reviewIndex].classList.add("active");
     }, 4000);
   }
 
-  /* ================= DATA ================= */
-
-  const servicesData = [
-    { title: "Minor & Major Engine Service", desc: "Complete engine servicing.", img: "images/service1.png" },
-    { title: "Diagnosis & Programming", desc: "Advanced diagnostics.", img: "images/service2.png" },
-    { title: "Transmission Services", desc: "Gearbox & transmission repairs.", img: "images/service3.png" },
-    { title: "Suspension Services", desc: "Smooth ride solutions.", img: "images/service4.png" },
-    { title: "Body Works & Paint", desc: "Professional body repairs.", img: "images/service5.png" },
-    { title: "Pre-Purchase Inspection", desc: "Full inspection reports.", img: "images/service6.png" },
-    { title: "Software Coding", desc: "ECU & module updates.", img: "images/service7.png" },
-    { title: "Key Duplication", desc: "Secure key cloning.", img: "images/service8.png" },
-    { title: "Interior Works", desc: "Interior restoration.", img: "images/service9.png" }
-  ];
-
-  const productsData = [
-    { title: "BMW X6 Air Struts", price: "KSh 180,000", img: "images/product1.png" },
-    { title: "BMW F22 Headlights", price: "KSh 250,000", img: "images/product2.png" },
-    { title: "Porsche Cayenne Air Suspension", price: "KSh 370,000", img: "images/product3.png" },
-    { title: "Porsche Xenon Headlights", price: "KSh 130,000", img: "images/product4.png" }
-  ];
-
-  const brands = {
+  /* ================= BRAND NAVIGATION ================= */
+  const brandPages = {
     audi: "audi.html",
     bmw: "bmw.html",
     mercedes: "mercedes.html",
@@ -61,8 +77,63 @@ document.addEventListener("DOMContentLoaded", () => {
     range: "range.html"
   };
 
-  /* ================= CHATBOT ================= */
+  document.querySelectorAll(".brand-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const brand = card.dataset.brand;
+      if (brandPages[brand]) {
+        window.location.href = brandPages[brand];
+      }
+    });
+  });
 
+  /* ================= BOOKING → WHATSAPP ================= */
+  const bookingForm = document.getElementById("bookingForm");
+  const popup = document.getElementById("confirmationPopup");
+
+  if (bookingForm) {
+    bookingForm.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+      const service = document.getElementById("service").value;
+      const message = document.getElementById("message").value;
+
+      const text =
+        `Booking Request:%0A` +
+        `Name: ${name}%0A` +
+        `Phone: ${phone}%0A` +
+        `Service: ${service}%0A` +
+        `Message: ${message}`;
+
+      popup.style.display = "block";
+
+      setTimeout(() => {
+        window.open(
+          `https://wa.me/254704222666?text=${text}`,
+          "_blank"
+        );
+        popup.style.display = "none";
+        bookingForm.reset();
+      }, 1200);
+    });
+  }
+
+  /* ================= COPY PAYMENT DETAILS ================= */
+  window.copyText = function (text) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Copied: " + text);
+    });
+  };
+
+  /* ================= SIMPLE CART (UI ONLY) ================= */
+  document.querySelectorAll(".add-cart").forEach(btn => {
+    btn.addEventListener("click", () => {
+      alert("Product added to cart 🛒 (Checkout coming soon)");
+    });
+  });
+
+  /* ================= CHATBOT ================= */
   const chatBox = document.getElementById("chatbot-container");
   const chatToggle = document.getElementById("chatbot-toggle");
   const chatClose = document.getElementById("chatbot-close");
@@ -73,66 +144,47 @@ document.addEventListener("DOMContentLoaded", () => {
   if (chatToggle) chatToggle.onclick = () => chatBox.style.display = "flex";
   if (chatClose) chatClose.onclick = () => chatBox.style.display = "none";
 
-  function botMsg(html) {
+  function addMessage(text, type) {
     const div = document.createElement("div");
-    div.className = "message bot";
-    div.innerHTML = html;
+    div.className = `message ${type}`;
+    div.innerHTML = text;
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
   }
 
-  function userMsg(text) {
-    const div = document.createElement("div");
-    div.className = "message user";
-    div.textContent = text;
-    messages.appendChild(div);
-  }
+  function botReply(msg) {
+    const m = msg.toLowerCase();
 
-  function handleMessage(text) {
-    const msg = text.toLowerCase();
-
-    if (msg.includes("hi") || msg.includes("hello")) {
-      botMsg("Hi 👋 How can I help you? Ask about <b>services</b>, <b>shop</b> or <b>brands</b>.");
+    if (m.includes("hi") || m.includes("hello")) {
+      addMessage("Hello 👋 How can I help you today?", "bot");
       return;
     }
 
-    if (msg.includes("service")) {
-      botMsg(servicesData.map(s =>
-        `<div><img src="${s.img}" width="60"><b>${s.title}</b><p>${s.desc}</p></div>`
-      ).join(""));
+    if (m.includes("service")) {
+      addMessage("We offer engine service, diagnostics, suspension, transmission, bodywork & more.", "bot");
       return;
     }
 
-    if (msg.includes("shop") || msg.includes("product")) {
-      botMsg(productsData.map(p =>
-        `<div><img src="${p.img}" width="60"><b>${p.title}</b><p>${p.price}</p></div>`
-      ).join(""));
+    if (m.includes("location")) {
+      addMessage("We are located at Ngong Road, Kiambu By-pass & Karen.", "bot");
       return;
     }
 
-    Object.keys(brands).forEach(b => {
-      if (msg.includes(b)) {
-        botMsg(`View ${b.toUpperCase()} services 👉 <a href="${brands[b]}" target="_blank">Open Page</a>`);
-      }
-    });
+    if (m.includes("contact")) {
+      addMessage("📞 0704 222 666 / 0798 690 204<br>✉ germanexpertscenter@gmail.com", "bot");
+      return;
+    }
+
+    addMessage("Please ask about services, booking, brands or locations.", "bot");
   }
 
   if (sendBtn) {
-    sendBtn.onclick = () => {
+    sendBtn.addEventListener("click", () => {
       if (!input.value.trim()) return;
-      userMsg(input.value);
-      handleMessage(input.value);
+      addMessage(input.value, "user");
+      botReply(input.value);
       input.value = "";
-    };
-  }
-
-  /* ================= BRAND CLICK ================= */
-
-  document.querySelectorAll(".brand-card").forEach(card => {
-    card.addEventListener("click", () => {
-      const key = card.dataset.brand;
-      if (brands[key]) window.location.href = brands[key];
     });
-  });
+  }
 
 });
