@@ -78,30 +78,38 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Range Rover", img: "brands/range-rover.png", page: "range.html" }
   ];
 
-  // Get container
   const brandsSection = document.getElementById("specialization");
+  if (!brandsSection) return;
+
+  // Create grid container
   const brandsGrid = document.createElement("div");
   brandsGrid.className = "brands-grid";
 
-  // Generate brand cards
-  brandsData.forEach((brand) => {
+  brandsData.forEach(brand => {
     const card = document.createElement("div");
     card.className = "brand-card";
 
-    card.innerHTML = `
-      <img src="${brand.img}" alt="${brand.name} Logo">
-      <p>${brand.name}</p>
-    `;
+    // Create clickable link around card
+    const link = document.createElement("a");
+    link.href = brand.page;
 
-    // Click opens the brand page
-    card.addEventListener("click", () => {
-      window.location.href = brand.page;
-    });
+    // Brand image
+    const img = document.createElement("img");
+    img.src = brand.img;
+    img.alt = brand.name + " Logo";
+
+    // Brand name
+    const p = document.createElement("p");
+    p.textContent = brand.name;
+
+    // Append image & name to link, link to card
+    link.appendChild(img);
+    link.appendChild(p);
+    card.appendChild(link);
 
     brandsGrid.appendChild(card);
   });
 
-  // Append to section
   brandsSection.appendChild(brandsGrid);
 });
 
