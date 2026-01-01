@@ -70,12 +70,12 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
 
   const brandsData = [
-    { name: "Audi", img: "brands/audi.png", page: "audi.html" },
-    { name: "BMW", img: "brands/bmw.png", page: "bmw.html" },
-    { name: "Mercedes-Benz", img: "brands/mercedes-benz.png", page: "mercedes.html" },
-    { name: "Volkswagen", img: "brands/volkswagen.png", page: "volkswagen.html" },
-    { name: "Porsche", img: "brands/porsche.png", page: "porsche.html" },
-    { name: "Range Rover", img: "brands/range-rover.png", page: "range.html" }
+    { name: "Audi", img: "audi.png", page: "audi.html" },
+    { name: "BMW", img: "bmw.png", page: "bmw.html" },
+    { name: "Mercedes-Benz", img: "mercedes-benz.png", page: "mercedes.html" },
+    { name: "Volkswagen", img: "volkswagen.png", page: "volkswagen.html" },
+    { name: "Porsche", img: "porsche.png", page: "porsche.html" },
+    { name: "Range Rover", img: "range-rover.png", page: "range.html" }
   ];
 
   // Get the brands section
