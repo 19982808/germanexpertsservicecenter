@@ -1,19 +1,4 @@
-/* =========================================================
-   GERMAN EXPERTS SERVICE CENTER – FULL SCRIPT
-   MATCHES PROVIDED HTML 100%
-========================================================= */
-
 document.addEventListener("DOMContentLoaded", () => {
-
-  /* ================= BURGER MENU ================= */
-  const burger = document.querySelector(".burger");
-  const nav = document.querySelector("header nav");
-
-  if (burger && nav) {
-    burger.addEventListener("click", () => {
-      nav.classList.toggle("open");
-    });
-  }
 
   /* ================= HERO SLIDER ================= */
   const slides = document.querySelectorAll(".slide");
@@ -21,14 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const prevBtn = document.querySelector(".prev");
   const nextBtn = document.querySelector(".next");
   let currentSlide = 0;
+  let slideInterval;
 
   function showSlide(index) {
-    slides.forEach((slide, i) => {
-      slide.classList.toggle("active", i === index);
-    });
-    dots.forEach((dot, i) => {
-      dot.classList.toggle("active", i === index);
-    });
+    slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+    dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
   }
 
   function nextSlide() {
@@ -41,18 +23,25 @@ document.addEventListener("DOMContentLoaded", () => {
     showSlide(currentSlide);
   }
 
-  if (nextBtn) nextBtn.addEventListener("click", nextSlide);
-  if (prevBtn) prevBtn.addEventListener("click", prevSlide);
+  function resetSlideInterval() {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(nextSlide, 5000);
+  }
+
+  if (nextBtn) nextBtn.addEventListener("click", () => { nextSlide(); resetSlideInterval(); });
+  if (prevBtn) prevBtn.addEventListener("click", () => { prevSlide(); resetSlideInterval(); });
 
   dots.forEach(dot => {
     dot.addEventListener("click", () => {
       currentSlide = Number(dot.dataset.index);
       showSlide(currentSlide);
+      resetSlideInterval();
     });
   });
 
   if (slides.length > 0) {
-    setInterval(nextSlide, 5000);
+    showSlide(currentSlide);
+    slideInterval = setInterval(nextSlide, 5000);
   }
 
   /* ================= REVIEWS ROTATION ================= */
@@ -66,9 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
       reviews[reviewIndex].classList.add("active");
     }, 4000);
   }
-/* ================= DYNAMIC BRANDS SECTION ================= */
-document.addEventListener("DOMContentLoaded", () => {
 
+  /* ================= DYNAMIC BRANDS SECTION ================= */
   const brandsData = [
     { name: "Audi", img: "audi.png", page: "audi.html" },
     { name: "BMW", img: "bmw.png", page: "bmw.html" },
@@ -78,38 +66,21 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Range Rover", img: "range-rover.png", page: "range.html" }
   ];
 
-  // Get the brands section
   const brandsSection = document.getElementById("brands");
+  if (brandsSection) {
+    const brandsGrid = document.createElement("div");
+    brandsGrid.className = "brands-grid";
 
-  if (!brandsSection) return;
-
-  // Create grid container
-  const brandsGrid = document.createElement("div");
-  brandsGrid.className = "brands-grid";
-
-  // Generate each brand card
-  brandsData.forEach(brand => {
-    const card = document.createElement("div");
-    card.className = "brand-card";
-
-    card.innerHTML = `
-      <img src="${brand.img}" alt="${brand.name} Logo">
-      <p>${brand.name}</p>
-    `;
-
-    // Make the card clickable → opens the brand page
-    card.addEventListener("click", () => {
-      window.location.href = brand.page;
+    brandsData.forEach(brand => {
+      const card = document.createElement("div");
+      card.className = "brand-card";
+      card.innerHTML = `<img src="${brand.img}" alt="${brand.name} Logo"><p>${brand.name}</p>`;
+      card.addEventListener("click", () => window.location.href = brand.page);
+      brandsGrid.appendChild(card);
     });
 
-    brandsGrid.appendChild(card);
-  });
-
-  // Append the grid to the brands section
-  brandsSection.appendChild(brandsGrid);
-});
-
-
+    brandsSection.appendChild(brandsGrid);
+  }
 
   /* ================= BOOKING → WHATSAPP ================= */
   const bookingForm = document.getElementById("bookingForm");
@@ -119,25 +90,19 @@ document.addEventListener("DOMContentLoaded", () => {
     bookingForm.addEventListener("submit", e => {
       e.preventDefault();
 
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
       const service = document.getElementById("service").value;
-      const message = document.getElementById("message").value;
+      const message = document.getElementById("message").value.trim();
 
-      const text =
-        `Booking Request:%0A` +
-        `Name: ${name}%0A` +
-        `Phone: ${phone}%0A` +
-        `Service: ${service}%0A` +
-        `Message: ${message}`;
+      const text = encodeURIComponent(
+        `Booking Request:\nName: ${name}\nPhone: ${phone}\nService: ${service}\nMessage: ${message}`
+      );
 
       popup.style.display = "block";
 
       setTimeout(() => {
-        window.open(
-          `https://wa.me/254704222666?text=${text}`,
-          "_blank"
-        );
+        window.open(`https://wa.me/254704222666?text=${text}`, "_blank");
         popup.style.display = "none";
         bookingForm.reset();
       }, 1200);
@@ -145,16 +110,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ================= COPY PAYMENT DETAILS ================= */
-  window.copyText = function (text) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Copied: " + text);
-    });
+  window.copyText = function(text) {
+    navigator.clipboard.writeText(text).then(() => alert("Copied: " + text));
   };
 
-  /* ================= SIMPLE CART (UI ONLY) ================= */
+  /* ================= SIMPLE CART (localStorage) ================= */
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
   document.querySelectorAll(".add-cart").forEach(btn => {
     btn.addEventListener("click", () => {
-      alert("Product added to cart 🛒 (Checkout coming soon)");
+      const productName = btn.parentElement.querySelector("h3").textContent;
+      cart.push(productName);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert(`${productName} added to cart 🛒`);
     });
   });
 
@@ -179,28 +146,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function botReply(msg) {
     const m = msg.toLowerCase();
-
-    if (m.includes("hi") || m.includes("hello")) {
-      addMessage("Hello 👋 How can I help you today?", "bot");
-      return;
-    }
-
-    if (m.includes("service")) {
-      addMessage("We offer engine service, diagnostics, suspension, transmission, bodywork & more.", "bot");
-      return;
-    }
-
-    if (m.includes("location")) {
-      addMessage("We are located at Ngong Road, Kiambu By-pass & Karen.", "bot");
-      return;
-    }
-
-    if (m.includes("contact")) {
-      addMessage("📞 0704 222 666 / 0798 690 204<br>✉ germanexpertscenter@gmail.com", "bot");
-      return;
-    }
-
-    addMessage("Please ask about services, booking, brands or locations.", "bot");
+    if (m.includes("hi") || m.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
+    else if (m.includes("service")) addMessage("We offer engine service, diagnostics, suspension, transmission, bodywork & more.", "bot");
+    else if (m.includes("location")) addMessage("We are located at Ngong Road, Kiambu By-pass & Karen.", "bot");
+    else if (m.includes("contact")) addMessage("📞 0704 222 666 / 0798 690 204<br>✉ germanexpertscenter@gmail.com", "bot");
+    else addMessage("Please ask about services, booking, brands or locations.", "bot");
   }
 
   if (sendBtn) {
@@ -209,6 +159,11 @@ document.addEventListener("DOMContentLoaded", () => {
       addMessage(input.value, "user");
       botReply(input.value);
       input.value = "";
+    });
+
+    // Enable Enter key
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendBtn.click();
     });
   }
 
