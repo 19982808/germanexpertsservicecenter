@@ -67,24 +67,79 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 4000);
   }
 
-  /* ================= BRAND NAVIGATION ================= */
-  const brandPages = {
-    audi: "audi.html",
-    bmw: "bmw.html",
-    mercedes: "mercedes.html",
-    volkswagen: "volkswagen.html",
-    porsche: "porsche.html",
-    range: "range.html"
-  };
+/* ================= DYNAMIC BRANDS SECTION ================= */
+document.addEventListener("DOMContentLoaded", () => {
 
-  document.querySelectorAll(".brand-card").forEach(card => {
+  const brandsData = [
+    {
+      name: "Audi",
+      img: "images/audi.png",
+      details: "Audi: Specializing in A1-A8 models, engine diagnostics, suspension, and ECU coding."
+    },
+    {
+      name: "BMW",
+      img: "images/bmw.png",
+      details: "BMW: Full-service BMW repairs, air suspension, M-series upgrades, diagnostics."
+    },
+    {
+      name: "Mercedes-Benz",
+      img: "images/mercedes-benz.png",
+      details: "Mercedes-Benz: Engine tuning, diagnostics, AMG & luxury series servicing."
+    },
+    {
+      name: "Volkswagen",
+      img: "images/volkswagen.png",
+      details: "Volkswagen: All VW models, full repairs, brakes, and service packages."
+    },
+    {
+      name: "Porsche",
+      img: "images/porsche.png",
+      details: "Porsche: Cayenne, Panamera, 911 – performance and luxury servicing."
+    },
+    {
+      name: "Range Rover",
+      img: "images/range-rover.png",
+      details: "Range Rover: Suspension, diagnostics, software updates, and restoration."
+    }
+  ];
+
+  // Get container elements
+  const brandsSection = document.getElementById("specialization");
+  const brandsGrid = document.createElement("div");
+  brandsGrid.className = "brands-grid";
+  const brandDetails = document.createElement("section");
+  brandDetails.id = "brand-details";
+  brandDetails.className = "brand-details";
+
+  // Generate brand cards
+  brandsData.forEach((brand, index) => {
+    const card = document.createElement("div");
+    card.className = "brand-card";
+    card.dataset.brand = brand.name.toLowerCase().replace(/\s+/g, "");
+
+    card.innerHTML = `
+      <img src="${brand.img}" alt="${brand.name} Logo">
+      <p>${brand.name}</p>
+    `;
+
+    // Click event
     card.addEventListener("click", () => {
-      const brand = card.dataset.brand;
-      if (brandPages[brand]) {
-        window.location.href = brandPages[brand];
-      }
+      // Highlight active
+      document.querySelectorAll(".brand-card").forEach(c => c.classList.remove("active"));
+      card.classList.add("active");
+
+      // Show brand details
+      brandDetails.innerHTML = `<p>${brand.details}</p>`;
+      brandDetails.scrollIntoView({ behavior: "smooth" });
     });
+
+    brandsGrid.appendChild(card);
   });
+
+  // Append generated content to section
+  brandsSection.appendChild(brandsGrid);
+  brandsSection.appendChild(brandDetails);
+});
 
   /* ================= BOOKING → WHATSAPP ================= */
   const bookingForm = document.getElementById("bookingForm");
