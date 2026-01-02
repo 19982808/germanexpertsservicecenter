@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const shopGrid = document.querySelector(".shop-grid");
   if (!shopGrid) {
-    console.error("❌ No element with class 'shop-grid' found!");
+    console.error("❌ No .shop-grid found!");
     return;
   }
 
@@ -11,12 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return response.json();
     })
     .then(products => {
-      shopGrid.innerHTML = ""; // clear placeholder
+      console.log("✅ Products loaded:", products); // DEBUG
+
+      shopGrid.innerHTML = "";
 
       products.forEach(p => {
         const card = document.createElement("div");
         card.className = "product-card";
 
+        // Directly use the filename from JSON, images are in the same folder
         const imgSrc = p.images && p.images.length ? p.images[0] : "placeholder.jpg";
 
         card.innerHTML = `
@@ -30,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <button class="add-cart">Add to Cart</button>
         `;
 
-        // Add to cart
         card.querySelector(".add-cart").addEventListener("click", () => {
           let cart = JSON.parse(localStorage.getItem("cart")) || [];
           cart.push({ id: p.id, name: p.name, price: p.salePrice });
@@ -42,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     })
     .catch(err => {
-      console.error(err);
-      shopGrid.innerHTML = "<p style='color:red;'>❌ Failed to load products. Check JSON path.</p>";
+      console.error("❌ Failed to load products:", err);
+      shopGrid.innerHTML = "<p style='color:red;'>Failed to load products. Check JSON path and console.</p>";
     });
 });
