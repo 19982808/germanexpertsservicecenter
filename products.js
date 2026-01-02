@@ -1,35 +1,37 @@
 const params = new URLSearchParams(window.location.search);
 const productId = params.get("id");
 
+// fetch JSON from repo
 fetch("products.json")
-  .then(res => res.json())
+  .then(response => {
+    if (!response.ok) throw new Error("Could not load JSON: " + response.status);
+    return response.json();
+  })
   .then(products => {
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
+    const shopGrid = document.querySelector(".shop-grid");
+    shopGrid.innerHTML = ""; // clear placeholder
 
-    document.getElementById("product-name").textContent = product.name;
-    document.getElementById("sale-price").textContent =
-      `KSh ${product.salePrice.toLocaleString()}`;
-    document.getElementById("original-price").textContent =
-      `KSh ${product.price.toLocaleString()}`;
-    document.getElementById("product-short").textContent =
-      product.shortDescription;
+    products.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.innerHTML = `
+        <h3>${p.name}</h3>
+        <p class="price">${p.price} <span class="original-price">${p.originalPrice}</span></p>
+        <img src="${p.img}" alt="${p.name}" style="width:100%;height:150px;object-fit:cover;margin-bottom:5px;">
+        <button class="add-cart">Add to Cart</button>
+      `;
+      shopGrid.appendChild(card);
 
-    document.getElementById("product-description").textContent =
-      product.description || "Contact us for full installation details.";
-
-    const imagesDiv = document.getElementById("product-images");
-    product.images.forEach(img => {
-      const image = document.createElement("img");
-      image.src = img;
-      imagesDiv.appendChild(image);
+      // Add to cart
+      card.querySelector(".add-cart").addEventListener("click", () => {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        cart.push(p.name);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        alert(`${p.name} added to cart 🛒`);
+      });
     });
-
-    // ADD TO CART
-    document.getElementById("add-to-cart").onclick = () => {
-      let cart = JSON.parse(localStorage.getItem("cart")) || [];
-      cart.push(product);
-      localStorage.setItem("cart", JSON.stringify(cart));
-      alert("Added to cart 🛒");
-    };
+  })
+  .catch(err => {
+    console.error(err);
+    document.querySelector(".shop-grid").innerHTML = "<p style='color:red;'>Failed to load products.</p>";
   });
