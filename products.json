@@ -6,7 +6,7 @@
     "price": 200000,
     "salePrice": 180000,
     "shortDescription": "Premium air suspension for BMW X6 F16 models.",
-    "images": ["products1.jpg"]
+    "images": ["product1.jpg"]
   },
   {
     "id": "f87-m2-headlights",
@@ -15,7 +15,7 @@
     "price": 280000,
     "salePrice": 250000,
     "shortDescription": "Original BMW M2 xenon headlights.",
-    "images": ["products2.jpg"]
+    "images": ["product2.jpg"]
   },
   {
     "id": "porsche-cayenne-2011-air-suspension",
@@ -24,7 +24,7 @@
     "price": 400000,
     "salePrice": 370000,
     "shortDescription": "OEM-quality air suspension for Porsche Cayenne.",
-    "images": ["products3.jpg"]
+    "images": ["product3.jpg"]
   },
   {
     "id": "porsche-cayenne-xenon-headlights",
@@ -33,7 +33,7 @@
     "price": 150000,
     "salePrice": 130000,
     "shortDescription": "High-performance xenon projector headlights.",
-    "images": ["products4.jpg"]
+    "images": ["product4.jpg"]
   },
   {
     "id": "audi-a6-c7-air-suspension",
