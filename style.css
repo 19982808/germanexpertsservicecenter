@@ -36,7 +36,7 @@ header {
 }
 
 header .logo {
-  max-height: 50px; /* fixed max height */
+  max-height: 80px; /* fixed max height */
   width: auto;      /* maintain aspect ratio */
   display: block;
 }
