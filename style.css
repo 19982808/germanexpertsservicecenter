@@ -22,33 +22,85 @@ img {
   display: block;
 }
 
-/* ================= HEADER ================= */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 50px;
-  background-color: #004080;
-  color: white;
+/* ================= INTEGRATED HEADER ================= */
+.site-header {
   position: sticky;
   top: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0,64,128,0.98),
+    rgba(0,64,128,0.92)
+  );
+  backdrop-filter: blur(6px);
   z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-header .logo {
-  height: 60px;
+.header-inner {
+  max-width: 1300px;
+  margin: auto;
+  padding: 18px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-header nav a {
-  margin-left: 25px;
-  color: white;
+/* BRAND AREA */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand img {
+  height: 52px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.brand img {
+  background: transparent;
+}
+
+.brand-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+/* NAVIGATION */
+.main-nav {
+  display: flex;
+  gap: 28px;
+}
+
+.main-nav a {
+  color: rgba(255,255,255,0.85);
   font-weight: 600;
+  position: relative;
+  padding-bottom: 4px;
   transition: 0.3s;
 }
 
-header nav a:hover {
-  color: #ffcc00;
+.main-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: #ffcc00;
+  transition: width 0.3s;
 }
+
+.main-nav a:hover {
+  color: #fff;
+}
+
+.main-nav a:hover::after {
+  width: 100%;
+}
+
 
 /* ================= HERO ================= */
 .hero {
