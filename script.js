@@ -126,6 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ================= CHATBOT ================= */
+  document.addEventListener("DOMContentLoaded", () => {
   const chatBox = document.getElementById("chatbot-container");
   const chatToggle = document.getElementById("chatbot-toggle");
   const chatClose = document.getElementById("chatbot-close");
@@ -133,17 +134,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("chatbot-input");
   const sendBtn = document.getElementById("chatbot-send");
 
-  if (chatToggle) chatToggle.onclick = () => chatBox.style.display = "flex";
-  if (chatClose) chatClose.onclick = () => chatBox.style.display = "none";
+  // Show the chatbot when the toggle button is clicked
+  if (chatToggle) {
+    chatToggle.onclick = () => {
+      chatBox.style.display = "flex"; // Show chatbot
+    };
+  }
 
+  // Close the chatbot when the close button is clicked
+  if (chatClose) {
+    chatClose.onclick = () => {
+      chatBox.style.display = "none"; // Hide chatbot
+    };
+  }
+
+  // Function to add a message to the chat
   function addMessage(text, type) {
     const div = document.createElement("div");
     div.className = `message ${type}`;
     div.innerHTML = text;
     messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
+    messages.scrollTop = messages.scrollHeight; // Scroll to the bottom
   }
 
+  // Function to handle bot replies
   function botReply(msg) {
     const m = msg.toLowerCase();
     if (m.includes("hi") || m.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
@@ -153,19 +167,24 @@ document.addEventListener("DOMContentLoaded", () => {
     else addMessage("Please ask about services, booking, brands or locations.", "bot");
   }
 
+  // Handle send button click
   if (sendBtn) {
     sendBtn.addEventListener("click", () => {
-      if (!input.value.trim()) return;
-      addMessage(input.value, "user");
-      botReply(input.value);
-      input.value = "";
+      if (!input.value.trim()) return; // Prevent empty messages
+      addMessage(input.value, "user"); // Add user message
+      botReply(input.value); // Get bot reply
+      input.value = ""; // Clear input field
     });
 
-    // Enable Enter key
+    // Enable Enter key to send messages
     input.addEventListener("keypress", (e) => {
       if (e.key === "Enter") sendBtn.click();
     });
   }
+
+  // Ensure the chatbot is initially hidden
+  chatBox.style.display = "none"; // Hide chatbot by default
+});
 
   /* ================= SMOOTH SCROLLING ================= */
   document.querySelectorAll('nav a').forEach(anchor => {
