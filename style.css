@@ -36,8 +36,8 @@ header {
 }
 
 header .logo {
-  height: 180px;
-  width: 200px;
+  height: 80px;
+  width:auto;
   object-fit: contain;
 }
 
