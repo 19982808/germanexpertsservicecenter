@@ -277,3 +277,32 @@ options.forEach(btn => {
   });
 
 });
+/* ================= RENDER PRODUCTS ================= */
+const shopGrid = document.getElementById("shop-grid");
+
+if (shopGrid && typeof products !== "undefined") {
+  shopGrid.innerHTML = "";
+
+  products.forEach(product => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+
+    card.innerHTML = `
+      <img src="${product.image}" alt="${product.name}">
+      <h3>${product.name}</h3>
+      <p class="price">
+        KSh ${product.price.toLocaleString()}
+        <span class="original-price">
+          KSh ${product.oldPrice.toLocaleString()}
+        </span>
+      </p>
+      <button class="add-cart">Add to Cart</button>
+    `;
+
+    card.querySelector(".add-cart").addEventListener("click", () => {
+      addToCart(product);
+    });
+
+    shopGrid.appendChild(card);
+  });
+}
