@@ -6,7 +6,7 @@
     "price": 200000,
     "salePrice": 180000,
     "shortDescription": "Premium air suspension for BMW X6 F16 models.",
-    "images": ["bmw-x6-1.jpg"]
+    "images": ["products1.jpg"]
   },
   {
     "id": "f87-m2-headlights",
@@ -15,7 +15,7 @@
     "price": 280000,
     "salePrice": 250000,
     "shortDescription": "Original BMW M2 xenon headlights.",
-    "images": ["m2-headlights.jpg"]
+    "images": ["products2.jpg"]
   },
   {
     "id": "porsche-cayenne-2011-air-suspension",
@@ -24,7 +24,7 @@
     "price": 400000,
     "salePrice": 370000,
     "shortDescription": "OEM-quality air suspension for Porsche Cayenne.",
-    "images": ["cayenne-air.jpg"]
+    "images": ["products3.jpg"]
   },
   {
     "id": "porsche-cayenne-xenon-headlights",
@@ -33,7 +33,7 @@
     "price": 150000,
     "salePrice": 130000,
     "shortDescription": "High-performance xenon projector headlights.",
-    "images": ["cayenne-headlights.jpg"]
+    "images": ["products4.jpg"]
   },
   {
     "id": "audi-a6-c7-air-suspension",
@@ -42,16 +42,16 @@
     "price": 220000,
     "salePrice": 200000,
     "shortDescription": "Comfort-enhancing air suspension kit for Audi A6.",
-    "images": ["a6-air.jpg"]
+    "images": ["product5.jpg"]
   },
-  {
+
     "id": "mercedes-w212-headlights",
     "name": "Mercedes Benz W212 Headlights",
     "category": "Headlights",
     "price": 170000,
     "salePrice": 150000,
     "shortDescription": "Genuine Mercedes W212 headlights.",
-    "images": ["w212-headlights.jpg"]
+    "images": ["product6.jpg"]
   },
   {
     "id": "bmw-f30-m-sport-struts",
@@ -60,7 +60,7 @@
     "price": 200000,
     "salePrice": 180000,
     "shortDescription": "M Sport suspension struts for BMW F30.",
-    "images": ["f30-struts.jpg"]
+    "images": ["product7.jpg"]
   },
   {
     "id": "vw-golf-mk7-air-suspension",
@@ -69,7 +69,7 @@
     "price": 170000,
     "salePrice": 150000,
     "shortDescription": "Air suspension system for VW Golf Mk7.",
-    "images": ["golf-air.jpg"]
+    "images": ["product8.jpg"]
   },
   {
     "id": "porsche-panamera-headlights",
@@ -78,7 +78,7 @@
     "price": 200000,
     "salePrice": 180000,
     "shortDescription": "Premium headlights for Porsche Panamera.",
-    "images": ["panamera-headlights.jpg"]
+    "images": ["product9.jpg"]
   },
   {
     "id": "bmw-x5-f15-air-struts",
@@ -87,7 +87,7 @@
     "price": 240000,
     "salePrice": 220000,
     "shortDescription": "Reliable air suspension struts for BMW X5.",
-    "images": ["x5-air.jpg"]
+    "images": ["product10.jpg"]
   },
   {
     "id": "mercedes-glc-xenon-headlights",
@@ -96,7 +96,7 @@
     "price": 180000,
     "salePrice": 160000,
     "shortDescription": "Original xenon headlights for Mercedes GLC.",
-    "images": ["glc-headlights.jpg"]
+    "images": ["product11.jpg"]
   },
   {
     "id": "bmw-f30-headlights",
@@ -105,7 +105,7 @@
     "price": 160000,
     "salePrice": 140000,
     "shortDescription": "BMW F30 headlights with factory fit.",
-    "images": ["f30-headlights.jpg"]
+    "images": ["product12.jpg"]
   },
   {
     "id": "porsche-cayenne-2010-air-struts",
@@ -114,6 +114,6 @@
     "price": 380000,
     "salePrice": 350000,
     "shortDescription": "Heavy-duty air struts for older Cayenne models.",
-    "images": ["cayenne-old-air.jpg"]
+    "images": ["product13.jpg"]
   }
 ]
