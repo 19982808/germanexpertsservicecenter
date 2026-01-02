@@ -162,15 +162,15 @@ function scrollToSection(selector) {
 const sectionPreviews = {
   services: () => {
     const services = [
-      { name: "Engine Service", id: "#services", img: "images/service1.png" },
-      { name: "Diagnostics", id: "#services", img: "images/service2.png" },
-      { name: "Transmission", id: "#services", img: "images/service3.png" },
-      { name: "Suspension", id: "#services", img: "images/service4.png" },
-      { name: "Body & Paint", id: "#services", img: "images/service5.png" },
-      { name: "Pre-Purchase", id: "#services", img: "images/service6.png" },
-      { name: "Software Upgrades", id: "#services", img: "images/service7.png" },
-      { name: "Key Duplication", id: "#services", img: "images/service8.png" },
-      { name: "Interior Works", id: "#services", img: "images/service9.png" }
+      { name: "Engine Service", id: "#services", img: "service1.png" },
+      { name: "Diagnostics", id: "#services", img: "service2.png" },
+      { name: "Transmission", id: "#services", img: "service3.png" },
+      { name: "Suspension", id: "#services", img: "service4.png" },
+      { name: "Body & Paint", id: "#services", img: "service5.png" },
+      { name: "Pre-Purchase", id: "#services", img: "service6.png" },
+      { name: "Software Upgrades", id: "#services", img: "service7.png" },
+      { name: "Key Duplication", id: "#services", img: "service8.png" },
+      { name: "Interior Works", id: "#services", img: "service9.png" }
     ];
     let html = `<strong>Our Services:</strong><div style="display:flex;overflow-x:auto;gap:5px;padding:5px 0;">`;
     services.forEach(s => {
