@@ -126,64 +126,59 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ================= CHATBOT ================= */
-  document.addEventListener("DOMContentLoaded", () => {
-  const chatBox = document.getElementById("chatbot-container");
-  const chatToggle = document.getElementById("chatbot-toggle");
-  const chatClose = document.getElementById("chatbot-close");
-  const messages = document.getElementById("chatbot-messages");
-  const input = document.getElementById("chatbot-input");
-  const sendBtn = document.getElementById("chatbot-send");
 
-  // Show the chatbot when the toggle button is clicked
-  if (chatToggle) {
-    chatToggle.onclick = () => {
-      chatBox.style.display = "flex"; // Show chatbot
-    };
-  }
+const chatBox = document.getElementById("chatbot-container");
+const chatToggle = document.getElementById("chatbot-toggle");
+const chatClose = document.getElementById("chatbot-close");
+const messages = document.getElementById("chatbot-messages");
+const input = document.getElementById("chatbot-input");
+const sendBtn = document.getElementById("chatbot-send");
+const options = document.querySelectorAll("#chatbot-options button");
 
-  // Close the chatbot when the close button is clicked
-  if (chatClose) {
-    chatClose.onclick = () => {
-      chatBox.style.display = "none"; // Hide chatbot
-    };
-  }
+// Show/hide chatbot
+chatToggle.onclick = () => chatBox.style.display = "flex";
+chatClose.onclick = () => chatBox.style.display = "none";
 
-  // Function to add a message to the chat
-  function addMessage(text, type) {
-    const div = document.createElement("div");
-    div.className = `message ${type}`;
-    div.innerHTML = text;
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight; // Scroll to the bottom
-  }
+// Add message to chat
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = `message ${type}`;
+  div.innerHTML = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
 
-  // Function to handle bot replies
-  function botReply(msg) {
-    const m = msg.toLowerCase();
-    if (m.includes("hi") || m.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
-    else if (m.includes("service")) addMessage("We offer engine service, diagnostics, suspension, transmission, bodywork & more.", "bot");
-    else if (m.includes("location")) addMessage("We are located at Ngong Road, Kiambu By-pass & Karen.", "bot");
-    else if (m.includes("contact")) addMessage("📞 0704 222 666 / 0798 690 204<br>✉ germanexpertscenter@gmail.com", "bot");
-    else addMessage("Please ask about services, booking, brands or locations.", "bot");
-  }
+// Bot reply logic
+function botReply(msg) {
+  const m = msg.toLowerCase();
+  if (m.includes("hi") || m.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
+  else if (m.includes("service")) addMessage("We offer engine service, diagnostics, suspension, transmission, bodywork & more.", "bot");
+  else if (m.includes("location")) addMessage("We are located at Ngong Road, Kiambu By-pass & Karen.", "bot");
+  else if (m.includes("contact")) addMessage("📞 0704 222 666 / 0798 690 204<br>✉ germanexpertscenter@gmail.com", "bot");
+  else addMessage("Please ask about services, booking, brands or locations.", "bot");
+}
 
-  // Handle send button click
-  if (sendBtn) {
-    sendBtn.addEventListener("click", () => {
-      if (!input.value.trim()) return; // Prevent empty messages
-      addMessage(input.value, "user"); // Add user message
-      botReply(input.value); // Get bot reply
-      input.value = ""; // Clear input field
-    });
+// Send message on button click or Enter
+sendBtn.addEventListener("click", () => {
+  if (!input.value.trim()) return;
+  addMessage(input.value, "user");
+  botReply(input.value);
+  input.value = "";
+});
 
-    // Enable Enter key to send messages
-    input.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendBtn.click();
-    });
-  }
+input.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendBtn.click();
+});
 
-  // Ensure the chatbot is initially hidden
-  chatBox.style.display = "none"; // Hide chatbot by default
+// Option buttons
+options.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const option = btn.dataset.option;
+    if(option === "services") botReply("We offer engine service, diagnostics, suspension, transmission, bodywork & more.");
+    if(option === "booking") botReply("You can book an appointment via the booking section above.");
+    if(option === "locations") botReply("We are located at Ngong Road, Kiambu By-pass & Karen.");
+    if(option === "contact") botReply("📞 0704 222 666 / 0798 690 204<br>✉ germanexpertscenter@gmail.com");
+  });
 });
 
   /* ================= SMOOTH SCROLLING ================= */
