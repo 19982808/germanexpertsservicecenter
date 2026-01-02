@@ -125,8 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ================= CHATBOT ================= */
-
+  // ================= CHATBOT WITH FULL MINI SECTIONS =================
 const chatBox = document.getElementById("chatbot-container");
 const chatToggle = document.getElementById("chatbot-toggle");
 const chatClose = document.getElementById("chatbot-close");
@@ -140,25 +139,128 @@ chatToggle.onclick = () => chatBox.style.display = "flex";
 chatClose.onclick = () => chatBox.style.display = "none";
 
 // Add message to chat
-function addMessage(text, type) {
+function addMessage(content, type) {
   const div = document.createElement("div");
   div.className = `message ${type}`;
-  div.innerHTML = text;
+  div.innerHTML = content;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
 }
 
-// Bot reply logic
+// ===== CLICK TO SCROLL FUNCTION =====
+function scrollToSection(selector) {
+  const section = document.querySelector(selector);
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+    addMessage(`✅ Jumped to ${selector.replace("#","")} section.`, "bot");
+  } else {
+    addMessage(`❌ Section not found.`, "bot");
+  }
+}
+
+// ===== MINI PREVIEWS WITH SCROLLABLE CARDS =====
+const sectionPreviews = {
+  services: () => {
+    const services = [
+      { name: "Engine Service", id: "#services", img: "images/service1.png" },
+      { name: "Diagnostics", id: "#services", img: "images/service2.png" },
+      { name: "Transmission", id: "#services", img: "images/service3.png" },
+      { name: "Suspension", id: "#services", img: "images/service4.png" },
+      { name: "Body & Paint", id: "#services", img: "images/service5.png" },
+      { name: "Pre-Purchase", id: "#services", img: "images/service6.png" },
+      { name: "Software Upgrades", id: "#services", img: "images/service7.png" },
+      { name: "Key Duplication", id: "#services", img: "images/service8.png" },
+      { name: "Interior Works", id: "#services", img: "images/service9.png" }
+    ];
+    let html = `<strong>Our Services:</strong><div style="display:flex;overflow-x:auto;gap:5px;padding:5px 0;">`;
+    services.forEach(s => {
+      html += `<div onclick="scrollToSection('${s.id}')" style="flex:0 0 auto;width:120px;background:#4B88C4;color:#fff;border-radius:8px;padding:5px;cursor:pointer;text-align:center;font-size:12px;">
+        <img src="${s.img}" style="width:100%;height:60px;object-fit:cover;border-radius:5px;margin-bottom:4px;">
+        ${s.name}
+      </div>`;
+    });
+    html += `</div>`;
+    return html;
+  },
+
+  products: () => {
+    const products = [
+      { name: "BMW X6 Air Struts", price: "KSh 180,000", id: "#shop", img: "images/product1.jpg" },
+      { name: "F87 M2 Headlights", price: "KSh 250,000", id: "#shop", img: "images/product2.jpg" },
+      { name: "Porsche Cayenne Air Suspension", price: "KSh 370,000", id: "#shop", img: "images/product3.jpg" },
+      { name: "Audi A6 Air Kit", price: "KSh 200,000", id: "#shop", img: "images/product4.jpg" }
+    ];
+    let html = `<strong>Shop Highlights:</strong><div style="display:flex;overflow-x:auto;gap:5px;padding:5px 0;">`;
+    products.forEach(p => {
+      html += `<div onclick="scrollToSection('${p.id}')" style="flex:0 0 auto;width:120px;background:#4B88C4;color:#fff;border-radius:8px;padding:5px;cursor:pointer;text-align:center;font-size:12px;">
+        <img src="${p.img}" style="width:100%;height:60px;object-fit:cover;border-radius:5px;margin-bottom:4px;">
+        ${p.name}<br><span style="font-size:11px;">${p.price}</span>
+      </div>`;
+    });
+    html += `</div>`;
+    return html;
+  },
+
+  booking: () => {
+    return `<strong>Book an Appointment:</strong><br>
+    <button style="padding:5px 8px;margin-top:5px;cursor:pointer;background:#4B88C4;color:#fff;border:none;border-radius:4px;" onclick="scrollToSection('#booking')">Go to Booking Section</button>`;
+  },
+
+  locations: () => {
+    const locations = [
+      { name: "Ngong Road", id: "#locations", img: "images/location1.png" },
+      { name: "Kiambu By-pass", id: "#locations", img: "images/location2.png" },
+      { name: "Karen Branch", id: "#locations", img: "images/location3.png" }
+    ];
+    let html = `<strong>Our Locations:</strong><div style="display:flex;overflow-x:auto;gap:5px;padding:5px 0;">`;
+    locations.forEach(loc => {
+      html += `<div onclick="scrollToSection('${loc.id}')" style="flex:0 0 auto;width:120px;background:#4B88C4;color:#fff;border-radius:8px;padding:5px;cursor:pointer;text-align:center;font-size:12px;">
+        <img src="${loc.img}" style="width:100%;height:60px;object-fit:cover;border-radius:5px;margin-bottom:4px;">
+        ${loc.name}
+      </div>`;
+    });
+    html += `</div>`;
+    return html;
+  },
+
+  contact: () => {
+    return `<strong>Contact Us:</strong><br>
+    📞 0704 222 666 / 0798 690 204<br>
+    ✉ germanexpertscenter@gmail.com<br>
+    💬 <a href="https://wa.me/254704222666" target="_blank">WhatsApp Primary</a> | 
+    <a href="https://wa.me/254798690204" target="_blank">WhatsApp Secondary</a>`;
+  },
+
+  gallery: () => {
+    const galleryImages = [];
+    for(let i=1;i<=12;i++) {
+      galleryImages.push({ img: `images/gallery${i}.jpg`, id: "#gallery" });
+    }
+    let html = `<strong>Garage Gallery:</strong><div style="display:flex;overflow-x:auto;gap:5px;padding:5px 0;">`;
+    galleryImages.forEach(g => {
+      html += `<div onclick="scrollToSection('${g.id}')" style="flex:0 0 auto;width:100px;height:80px;cursor:pointer;border-radius:5px;overflow:hidden;">
+        <img src="${g.img}" style="width:100%;height:100%;object-fit:cover;">
+      </div>`;
+    });
+    html += `</div>`;
+    return html;
+  }
+};
+
+// ===== BOT LOGIC =====
 function botReply(msg) {
   const m = msg.toLowerCase();
   if (m.includes("hi") || m.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
-  else if (m.includes("service")) addMessage("We offer engine service, diagnostics, suspension, transmission, bodywork & more.", "bot");
-  else if (m.includes("location")) addMessage("We are located at Ngong Road, Kiambu By-pass & Karen.", "bot");
-  else if (m.includes("contact")) addMessage("📞 0704 222 666 / 0798 690 204<br>✉ germanexpertscenter@gmail.com", "bot");
-  else addMessage("Please ask about services, booking, brands or locations.", "bot");
+  else if (m.includes("service")) addMessage(sectionPreviews.services(), "bot");
+  else if (m.includes("booking")) addMessage(sectionPreviews.booking(), "bot");
+  else if (m.includes("location")) addMessage(sectionPreviews.locations(), "bot");
+  else if (m.includes("contact")) addMessage(sectionPreviews.contact(), "bot");
+  else if (m.includes("gallery")) addMessage(sectionPreviews.gallery(), "bot");
+  else if (m.includes("product") || m.includes("shop")) addMessage(sectionPreviews.products(), "bot");
+  else addMessage("Please ask about services, booking, locations, contact, gallery, or products.", "bot");
 }
 
-// Send message on button click or Enter
+// ===== SEND MESSAGE =====
 sendBtn.addEventListener("click", () => {
   if (!input.value.trim()) return;
   addMessage(input.value, "user");
@@ -170,14 +272,11 @@ input.addEventListener("keypress", (e) => {
   if (e.key === "Enter") sendBtn.click();
 });
 
-// Option buttons
+// ===== OPTION BUTTONS =====
 options.forEach(btn => {
   btn.addEventListener("click", () => {
     const option = btn.dataset.option;
-    if(option === "services") botReply("We offer engine service, diagnostics, suspension, transmission, bodywork & more.");
-    if(option === "booking") botReply("You can book an appointment via the booking section above.");
-    if(option === "locations") botReply("We are located at Ngong Road, Kiambu By-pass & Karen.");
-    if(option === "contact") botReply("📞 0704 222 666 / 0798 690 204<br>✉ germanexpertscenter@gmail.com");
+    addMessage(sectionPreviews[option](), "bot");
   });
 });
 
