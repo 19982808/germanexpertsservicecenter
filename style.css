@@ -36,19 +36,19 @@ header {
 }
 
 header .logo {
-  height: 80px;
-  width: auto;
+  height: 180px;
+  width: 200px;
   object-fit: contain;
 }
 
 header nav {
   display: flex;
-  gap: 35px;
+  gap: 25px;
 }
 
 header nav a {
   color: #FFD700;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 1rem;
   position: relative;
   padding-bottom: 4px;
