@@ -114,16 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
     navigator.clipboard.writeText(text).then(() => alert("Copied: " + text));
   };
 
-  /* ================= SIMPLE CART (localStorage) ================= */
+ function addToCart(product) {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  document.querySelectorAll(".add-cart").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const productName = btn.parentElement.querySelector("h3").textContent;
-      cart.push(productName);
-      localStorage.setItem("cart", JSON.stringify(cart));
-      alert(`${productName} added to cart 🛒`);
-    });
-  });
+  cart.push(product);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert(product.name + " added to cart 🛒");
+}
 
   // ================= CHATBOT WITH FULL MINI SECTIONS =================
 const chatBox = document.getElementById("chatbot-container");
@@ -183,23 +179,7 @@ const sectionPreviews = {
     return html;
   },
 
-  products: () => {
-    const products = [
-      { name: "BMW X6 Air Struts", price: "KSh 180,000", id: "#shop", img: "images/product1.jpg" },
-      { name: "F87 M2 Headlights", price: "KSh 250,000", id: "#shop", img: "images/product2.jpg" },
-      { name: "Porsche Cayenne Air Suspension", price: "KSh 370,000", id: "#shop", img: "images/product3.jpg" },
-      { name: "Audi A6 Air Kit", price: "KSh 200,000", id: "#shop", img: "images/product4.jpg" }
-    ];
-    let html = `<strong>Shop Highlights:</strong><div style="display:flex;overflow-x:auto;gap:5px;padding:5px 0;">`;
-    products.forEach(p => {
-      html += `<div onclick="scrollToSection('${p.id}')" style="flex:0 0 auto;width:120px;background:#4B88C4;color:#fff;border-radius:8px;padding:5px;cursor:pointer;text-align:center;font-size:12px;">
-        <img src="${p.img}" style="width:100%;height:60px;object-fit:cover;border-radius:5px;margin-bottom:4px;">
-        ${p.name}<br><span style="font-size:11px;">${p.price}</span>
-      </div>`;
-    });
-    html += `</div>`;
-    return html;
-  },
+  
 
   booking: () => {
     return `<strong>Book an Appointment:</strong><br>
