@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   /* ================= HERO SLIDER ================= */
   const slides = document.querySelectorAll(".slide");
   const dots = document.querySelectorAll(".dot");
@@ -35,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   nextBtn?.addEventListener("click", () => { nextSlide(); resetSlideInterval(); });
   prevBtn?.addEventListener("click", () => { prevSlide(); resetSlideInterval(); });
-
   dots.forEach(dot => {
     dot.addEventListener("click", () => {
       currentSlide = Number(dot.dataset.index);
@@ -55,14 +53,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 4000);
   }
 
+  /* ================= SERVICES WITH IMAGES ================= */
+  const servicesData = [
+    { name: "Minor & Major Engine Service", desc: "Comprehensive engine servicing including oil changes, brakes, and full inspections.", img: "engine-service.jpg" },
+    { name: "Diagnosis & Programming", desc: "Advanced computer diagnostics and electronic troubleshooting.", img: "diagnostics.jpg" },
+    { name: "Transmission Services", desc: "Fluid changes, repair, and full transmission servicing.", img: "transmission.jpg" },
+    { name: "Suspension Services", desc: "Full suspension inspections, repairs, and replacements.", img: "suspension.jpg" },
+    { name: "Body Works & Paint", desc: "High-quality bodywork repairs and paint restoration.", img: "body-paint.jpg" },
+    { name: "Car Pre-Purchase Inspection", desc: "Detailed inspections for buying used German cars.", img: "pre-purchase.jpg" },
+    { name: "Online Coding & Software Upgrades", desc: "Vehicle software updates and ECU programming.", img: "software.jpg" },
+    { name: "Key Duplication", desc: "Secure and reliable key duplication for all models.", img: "key.jpg" },
+    { name: "Interior Works", desc: "Repairs, restoration, and upgrades for interiors.", img: "interior.jpg" }
+  ];
+
+  const serviceSection = document.querySelector("#services .service-grid");
+  if (serviceSection) {
+    serviceSection.innerHTML = "";
+    servicesData.forEach(s => {
+      const card = document.createElement("div");
+      card.className = "service-card";
+      card.innerHTML = `
+        <img src="images/${s.img}" alt="${s.name}">
+        <h3>${s.name}</h3>
+        <p>${s.desc}</p>
+      `;
+      serviceSection.appendChild(card);
+    });
+  }
+
   /* ================= BRANDS ================= */
   const brands = [
-    { name: "Audi", img: "audi.png" },
-    { name: "BMW", img: "bmw.png" },
-    { name: "Mercedes", img: "mercedes-benz.png" },
-    { name: "Volkswagen", img: "volkswagen.png" },
-    { name: "Porsche", img: "porsche.png" },
-    { name: "Range Rover", img: "range-rover.png" }
+    { name: "Audi", img: "audi.png", page: "audi.html" },
+    { name: "BMW", img: "bmw.png", page: "bmw.html" },
+    { name: "Mercedes", img: "mercedes-benz.png", page: "mercedes.html" },
+    { name: "Volkswagen", img: "volkswagen.png", page: "volkswagen.html" },
+    { name: "Porsche", img: "porsche.png", page: "porsche.html" },
+    { name: "Range Rover", img: "range-rover.png", page: "rangerover.html" }
   ];
 
   const brandsSection = document.getElementById("brands");
@@ -73,37 +99,33 @@ document.addEventListener("DOMContentLoaded", () => {
     brands.forEach(b => {
       const card = document.createElement("div");
       card.className = "brand-card";
-      card.innerHTML = `<img src="${b.img}" alt="${b.name}"><p>${b.name}</p>`;
+      card.innerHTML = `<img src="images/${b.img}" alt="${b.name}"><p>${b.name}</p>`;
+      card.style.cursor = "pointer";
+      card.addEventListener("click", () => {
+        window.location.href = b.page;
+      });
       grid.appendChild(card);
     });
 
     brandsSection.appendChild(grid);
   }
 
-  /* ================= GLOBAL CART ================= */
+  /* ================= SHOP PRODUCTS ================= */
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
   }
 
-  /* ================= LOAD PRODUCTS ================= */
-  let productsList = [];
   fetch("products.json")
     .then(res => res.json())
-    .then(products => {
-      productsList = products;
-      renderShop(productsList);
-      renderCart();
-    })
-    .catch(err => console.error("Products load error:", err));
+    .then(products => renderShop(products))
+    .catch(err => console.error(err));
 
   function renderShop(products) {
     const shopGrid = document.querySelector(".shop-grid");
     if (!shopGrid) return;
-
     shopGrid.innerHTML = "";
-
     products.forEach(p => {
       const card = document.createElement("div");
       card.className = "product-card";
@@ -118,44 +140,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* ================= ADD TO CART ================= */
-  window.addToCart = function(productId) {
-    const product = productsList.find(p => p.id == productId);
-    if (!product) return;
-
-    const existing = cart.find(i => i.id == product.id);
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      cart.push({
-        id: product.id,
-        name: product.name,
-        price: product.salePrice,
-        image: product.images[0],
-        quantity: 1
+  function addToCart(productId) {
+    fetch("products.json")
+      .then(res => res.json())
+      .then(products => {
+        const product = products.find(p => p.id == productId);
+        if (!product) return;
+        const existing = cart.find(i => i.id == product.id);
+        if (existing) existing.quantity += 1;
+        else cart.push({ id: product.id, name: product.name, price: product.salePrice, image: product.images[0], quantity: 1 });
+        saveCart();
+        renderCart();
       });
-    }
-    saveCart();
-    renderCart();
-  };
+  }
 
-  window.addToCartFromChat = function(productId) {
-    addToCart(productId);
-  };
+  function addToCartFromChat(productId) { addToCart(productId); }
 
-  /* ================= RENDER CART ================= */
   function renderCart() {
     const cartItems = document.getElementById("cart-items");
     const cartTotal = document.getElementById("cart-total");
     if (!cartItems || !cartTotal) return;
-
     cartItems.innerHTML = "";
     let total = 0;
-
     cart.forEach(item => {
       const subtotal = item.price * item.quantity;
       total += subtotal;
-
       cartItems.innerHTML += `
         <div class="cart-item">
           <img src="images/${item.image}" width="50">
@@ -170,49 +179,43 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
     });
-
     cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()}`;
   }
 
-  /* ================= CART FUNCTIONS ================= */
-  window.changeQty = function(id, amount) {
+  function changeQty(id, amount) {
     const item = cart.find(i => i.id == id);
     if (!item) return;
-
     item.quantity += amount;
     if (item.quantity <= 0) cart = cart.filter(i => i.id != id);
-
     saveCart();
     renderCart();
-  };
+  }
 
-  window.removeItem = function(id) {
+  function removeItem(id) {
     cart = cart.filter(i => i.id != id);
     saveCart();
     renderCart();
-  };
+  }
+
+  renderCart();
 
   /* ================= WHATSAPP CHECKOUT ================= */
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
-    if (cart.length === 0) return alert("Cart is empty!");
-
+    if (!cart.length) return alert("Cart is empty!");
     let message = "🛒 *New Order*%0A%0A";
     let total = 0;
-
     cart.forEach(item => {
       const subtotal = item.price * item.quantity;
       total += subtotal;
       message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
     });
-
     message += `%0A*TOTAL: KSh ${total}*`;
     window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
   });
 
-  /* ================= BOOKING → WHATSAPP ================= */
+  /* ================= BOOKING FORM ================= */
   const bookingForm = document.getElementById("bookingForm");
   const popup = document.getElementById("confirmationPopup");
-
   bookingForm?.addEventListener("submit", e => {
     e.preventDefault();
     const text = encodeURIComponent(
@@ -225,155 +228,67 @@ document.addEventListener("DOMContentLoaded", () => {
       bookingForm.reset();
     }, 1000);
   });
-/* ================= CHATBOT FRANCO SMART ================= */
-const chatBox = document.getElementById("chatbot-container");
-const toggle = document.getElementById("chatbot-toggle");
-const close = document.getElementById("chatbot-close");
-const messages = document.getElementById("chatbot-messages");
-const input = document.getElementById("chatbot-input");
-const send = document.getElementById("chatbot-send");
 
-toggle.onclick = () => chatBox.style.display = "flex";
-close.onclick = () => chatBox.style.display = "none";
+  /* ================= FRANCO CHATBOT ================= */
+  const chatBox = document.getElementById("chatbot-container");
+  const toggle = document.getElementById("chatbot-toggle");
+  const close = document.getElementById("chatbot-close");
+  const messages = document.getElementById("chatbot-messages");
+  const input = document.getElementById("chatbot-input");
+  const send = document.getElementById("chatbot-send");
 
-// Chat message creator
-function addMessage(text, type = "bot") {
-  const div = document.createElement("div");
-  div.className = `message ${type}`;
-  div.innerHTML = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
+  toggle.onclick = () => chatBox.style.display = "flex";
+  close.onclick = () => chatBox.style.display = "none";
 
-// Fetch products globally for Franco
-let productsList = [];
-fetch("products.json")
-  .then(r => r.json())
-  .then(data => productsList = data);
-
-// Fetch brands
-const brands = [
-  { name: "Audi", img: "audi.png" },
-  { name: "BMW", img: "bmw.png" },
-  { name: "Mercedes", img: "mercedes-benz.png" },
-  { name: "Volkswagen", img: "volkswagen.png" },
-  { name: "Porsche", img: "porsche.png" },
-  { name: "Range Rover", img: "range-rover.png" }
-];
-
-// Franco reply
-function francoReply(msg) {
-  msg = msg.toLowerCase();
-
-  if (msg.includes("hi") || msg.includes("hello")) {
-    addMessage("Hello 👋! I’m Franco, your smart assistant. Ask me about services, products, brands, booking, locations, or your cart.", "bot");
+  function addMessage(text, type) {
+    const div = document.createElement("div");
+    div.className = `message ${type}`;
+    div.innerHTML = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
   }
-  else if (msg.includes("services")) {
-    const serviceSection = document.getElementById("services");
-    serviceSection?.scrollIntoView({behavior: "smooth"});
-    addMessage("Here are our services. Click to expand:", "bot");
 
-    document.querySelectorAll("#services .service-card").forEach((card, idx) => {
-      const name = card.querySelector("h3").textContent;
-      const desc = card.querySelector("p").textContent;
-      addMessage(`
-        <div class="chat-service" data-idx="${idx}">
-          <strong>${name}</strong> <button onclick="toggleService(${idx})">🔍</button>
-          <p id="service-desc-${idx}" style="display:none">${desc}</p>
-        </div>
-      `, "bot");
-    });
+  function botReply(msg) {
+    msg = msg.toLowerCase();
+    if (msg.includes("hi") || msg.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
+    else if (msg.includes("service")) {
+      servicesData.forEach(s => {
+        addMessage(`<strong>${s.name}</strong><br><img src="images/${s.img}" width="100"><br>${s.desc}`, "bot");
+      });
+    }
+    else if (msg.includes("brand") || msg.includes("brands")) {
+      brands.forEach(b => {
+        addMessage(`<strong>${b.name}</strong><br><img src="images/${b.img}" width="100"><br>Click to open: <a href="${b.page}">${b.name} Page</a>`, "bot");
+      });
+    }
+    else if (msg.includes("shop") || msg.includes("products")) {
+      fetch("products.json")
+        .then(res => res.json())
+        .then(products => {
+          products.slice(0, 3).forEach(p => {
+            addMessage(`<strong>${p.name}</strong><br><img src="images/${p.images[0]}" width="100"><br>KSh ${p.salePrice}`, "bot");
+          });
+        });
+    }
+    else if (msg.includes("contact")) addMessage("📞 0704 222 666<br>📍 Ngong Road, Kiambu & Karen", "bot");
+    else if (msg.includes("booking")) addMessage("To book, fill the form above or type service name.", "bot");
+    else addMessage("Ask me about services, brands, shop, booking or contact.", "bot");
   }
-  else if (msg.includes("products") || msg.includes("shop")) {
-    const shopSection = document.getElementById("shop");
-    shopSection?.scrollIntoView({behavior: "smooth"});
-    addMessage("Here are some products. Click 'Add to Cart' to buy:", "bot");
 
-    productsList.slice(0, 5).forEach(p => {
-      addMessage(`
-        <div class="chat-product">
-          <img src="images/${p.images[0]}" style="width:100px; border-radius:6px; cursor:pointer" onclick="scrollToProduct(${p.id})"><br>
-          <strong>${p.name}</strong><br>
-          ${p.description || ""}<br>
-          KSh ${p.salePrice.toLocaleString()}<br>
-          <button onclick="addToCart(${p.id})">Add to Cart 🛒</button>
-        </div>
-      `, "bot");
-    });
-  }
-  else if (msg.includes("brands")) {
-    const brandSection = document.getElementById("brands");
-    brandSection?.scrollIntoView({behavior: "smooth"});
-    addMessage("We specialize in these brands. Click to view:", "bot");
-    brands.forEach((b, idx) => addMessage(`<img src="${b.img}" style="width:80px; cursor:pointer" onclick="scrollToBrand(${idx})"><br>${b.name}`, "bot"));
-  }
-  else if (msg.includes("locations")) {
-    const locSection = document.getElementById("locations");
-    locSection?.scrollIntoView({behavior: "smooth"});
-    addMessage("Our branches are located here:", "bot");
-    addMessage("📍 Ngong Road, Kiambu By-pass & Karen", "bot");
-  }
-  else if (msg.includes("booking") || msg.includes("appointment")) {
-    const bookingSection = document.getElementById("booking");
-    bookingSection?.scrollIntoView({behavior: "smooth"});
-    addMessage("You can book an appointment here. Fill the form and we’ll confirm via WhatsApp.", "bot");
-  }
-  else if (msg.includes("cart") || msg.includes("checkout")) {
-    const shopSection = document.getElementById("shop");
-    shopSection?.scrollIntoView({behavior: "smooth"});
-    addMessage("Here’s your cart. Adjust quantities, remove items, or checkout via WhatsApp.", "bot");
-    renderCart(); // show live cart
-  }
-  else {
-    addMessage("I can help you navigate the site: services, products, brands, booking, locations, or cart.", "bot");
-  }
-}
+  send.onclick = () => {
+    if (!input.value.trim()) return;
+    addMessage(input.value, "user");
+    botReply(input.value);
+    input.value = "";
+  };
 
-// Toggle service descriptions
-window.toggleService = function(idx) {
-  const desc = document.getElementById(`service-desc-${idx}`);
-  if (desc) desc.style.display = desc.style.display === "none" ? "block" : "none";
-};
-
-// Scroll to product in shop
-window.scrollToProduct = function(id) {
-  const shopSection = document.getElementById("shop");
-  const productCard = Array.from(shopSection.querySelectorAll(".product-card")).find(c => c.querySelector("button")?.onclick.toString().includes(`addToCart(${id})`));
-  productCard?.scrollIntoView({behavior: "smooth"});
-  addMessage(`Scrolled to product <strong>${productCard.querySelector("h3").textContent}</strong>`, "bot");
-};
-
-// Scroll to brand
-window.scrollToBrand = function(idx) {
-  const brandSection = document.getElementById("brands");
-  const brandCard = brandSection.querySelectorAll(".brand-card")[idx];
-  brandCard?.scrollIntoView({behavior: "smooth"});
-  addMessage(`Scrolled to brand <strong>${brands[idx].name}</strong>`, "bot");
-};
-
-// Send message
-send.onclick = () => {
-  if (!input.value.trim()) return;
-  addMessage(input.value, "user");
-  francoReply(input.value);
-  input.value = "";
-};
-
-// Enter key sends
-input.addEventListener("keypress", e => {
-  if (e.key === "Enter") send.click();
-});
-
-  
+  input.addEventListener("keypress", e => { if (e.key === "Enter") send.click(); });
 
   /* ================= SMOOTH SCROLL ================= */
   document.querySelectorAll("nav a").forEach(link => {
     link.addEventListener("click", e => {
       e.preventDefault();
-      document.querySelector(link.getAttribute("href"))?.scrollIntoView({
-        behavior: "smooth"
-      });
+      document.querySelector(link.getAttribute("href"))?.scrollIntoView({ behavior: "smooth" });
     });
   });
-
 });
