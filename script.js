@@ -56,15 +56,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= SERVICES WITH IMAGES ================= */
   const servicesData = [
-    { name: "Minor & Major Engine Service", desc: "Comprehensive engine servicing including oil changes, brakes, and full inspections.", img: "engine-service.jpg" },
-    { name: "Diagnosis & Programming", desc: "Advanced computer diagnostics and electronic troubleshooting.", img: "diagnostics.jpg" },
-    { name: "Transmission Services", desc: "Fluid changes, repair, and full transmission servicing.", img: "transmission.jpg" },
-    { name: "Suspension Services", desc: "Full suspension inspections, repairs, and replacements.", img: "suspension.jpg" },
-    { name: "Body Works & Paint", desc: "High-quality bodywork repairs and paint restoration.", img: "body-paint.jpg" },
-    { name: "Car Pre-Purchase Inspection", desc: "Detailed inspections for buying used German cars.", img: "pre-purchase.jpg" },
-    { name: "Online Coding & Software Upgrades", desc: "Vehicle software updates and ECU programming.", img: "software.jpg" },
-    { name: "Key Duplication", desc: "Secure and reliable key duplication for all models.", img: "key.jpg" },
-    { name: "Interior Works", desc: "Repairs, restoration, and upgrades for interiors.", img: "interior.jpg" }
+    { name: "Minor & Major Engine Service", desc: "Comprehensive engine servicing including oil changes, brakes, and full inspections.", img: "service1.png" },
+    { name: "Diagnosis & Programming", desc: "Advanced computer diagnostics and electronic troubleshooting.", img: "service2.png" },
+    { name: "Transmission Services", desc: "Fluid changes, repair, and full transmission servicing.", img: "service3.png" },
+    { name: "Suspension Services", desc: "Full suspension inspections, repairs, and replacements.", img: "service4.png" },
+    { name: "Body Works & Paint", desc: "High-quality bodywork repairs and paint restoration.", img: "service5.png" },
+    { name: "Car Pre-Purchase Inspection", desc: "Detailed inspections for buying used German cars.", img: "service5.png" },
+    { name: "Online Coding & Software Upgrades", desc: "Vehicle software updates and ECU programming.", img: "service6.png" },
+    { name: "Key Duplication", desc: "Secure and reliable key duplication for all models.", img: "service7.png" },
+    { name: "Interior Works", desc: "Repairs, restoration, and upgrades for interiors.", img: "service8.png" }
   ];
 
   const serviceSection = document.querySelector("#services .service-grid");
