@@ -104,6 +104,23 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
 loadCart();
+document.getElementById('checkout-btn')?.addEventListener('click', () => {
+  if (!cart.length) {
+    alert('Your cart is empty');
+    return;
+  }
+
+  let message = '🛒 *New Order*%0A%0A';
+
+  cart.forEach(item => {
+    message += `${item.name} × ${item.quantity} — KSh ${(item.price * item.quantity).toLocaleString()}%0A`;
+  });
+
+  const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  message += `%0A*TOTAL: KSh ${total.toLocaleString()}*`;
+
+  window.open(`https://wa.me/254704222666?text=${message}`, '_blank');
+});
 
   /* ================= BOOKING → WHATSAPP ================= */
   const bookingForm = document.getElementById("bookingForm");
