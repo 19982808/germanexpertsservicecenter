@@ -118,11 +118,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function addToCart(productId) {
     const product = productsList.find(p => p.id === productId);
-    if (!product) return alert("Product not found!");
+    if (!product) {
+      showToast("❌ Product not found");
+      return;
+    }
 
-    const existing = cart.find(i => i.id === product.id);
+    const existing = cart.find(i => i.id === productId);
     if (existing) existing.quantity += 1;
-    else cart.push({ id: product.id, name: product.name, price: product.salePrice, quantity: 1 });
+    else cart.push({
+      id: product.id,
+      name: product.name || "Unnamed Product",
+      price: Number(product.salePrice) || 0,
+      quantity: 1
+    });
 
     saveCart();
     renderCart();
@@ -171,8 +179,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let total = 0;
 
     cart.forEach(item => {
+      if (!item.id || !item.name || isNaN(item.price) || !item.quantity) return;
+
       const subtotal = item.price * item.quantity;
       total += subtotal;
+
       cartItems.innerHTML += `
         <div class="cart-item">
           <strong>${item.name}</strong>
@@ -229,11 +240,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const send = document.getElementById("chatbot-send");
   const optionButtons = document.querySelectorAll("#chatbot-options button");
 
-  /* ---------- OPEN / CLOSE ---------- */
   toggle.addEventListener("click", () => chatBox.classList.remove("hidden"));
   closeBtn.addEventListener("click", () => chatBox.classList.add("hidden"));
 
-  /* ---------- ADD MESSAGE ---------- */
   function addMessage(text, type) {
     const div = document.createElement("div");
     div.className = `message ${type}`;
@@ -242,29 +251,23 @@ document.addEventListener("DOMContentLoaded", () => {
     messages.scrollTop = messages.scrollHeight;
   }
 
-  /* ---------- BOT LOGIC ---------- */
   function botReply(msg) {
     msg = msg.toLowerCase();
-
     if (msg.includes("hi") || msg.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
     else if (msg.includes("service")) servicesData.forEach(s => addMessage(`<strong>${s.name}</strong><br><img src="images/${s.img}" width="100"><br>${s.desc}`, "bot"));
     else if (msg.includes("brand")) brands.forEach(b => addMessage(`<strong>${b.name}</strong><br><img src="images/${b.img}" width="100"><br><a href="${b.page}" target="_blank">Open ${b.name}</a>`, "bot"));
     else if (msg.includes("shop") || msg.includes("products")) productsList.forEach(p => addMessage(`<strong>${p.name}</strong><br>KSh ${p.salePrice.toLocaleString()}<br><img src="images/${p.images[0]}" width="100"><br>ID: ${p.id}`, "bot"));
-    else if (msg.startsWith("add ")) {
-      const productId = msg.replace("add ", "").trim();
-      addToCart(productId);
-      addMessage("✅ Product added to your cart.", "bot");
-    }
-    else if (msg.includes("cart")) {
+    else if (msg.startsWith("add ")) { addToCart(msg.replace("add ", "").trim()); addMessage("✅ Product added to your cart.", "bot"); }
+    else if (msg.includes("cart")) { 
       if (!cart.length) { addMessage("Your cart is empty 🛒", "bot"); return; }
-      let total = 0; let cartText = "<strong>Your Cart:</strong><br>";
-      cart.forEach(item => { total += item.price * item.quantity; cartText += `${item.name} x${item.quantity} — KSh ${item.price * item.quantity}<br>`; });
+      let total = 0, cartText = "<strong>Your Cart:</strong><br>";
+      cart.forEach(item => { if (!item.id || !item.name) return; total += item.price * item.quantity; cartText += `${item.name} x${item.quantity} — KSh ${item.price * item.quantity}<br>`; });
       cartText += `<br><strong>Total: KSh ${total}</strong>`;
       addMessage(cartText, "bot");
     }
     else if (msg.includes("checkout")) {
       if (!cart.length) { addMessage("Your cart is empty 🛒", "bot"); return; }
-      let text = "🛒 *New Order*%0A%0A"; let total = 0;
+      let text = "🛒 *New Order*%0A%0A", total = 0;
       cart.forEach(item => { total += item.price * item.quantity; text += `• ${item.name} x${item.quantity} — KSh ${item.price * item.quantity}%0A`; });
       text += `%0A*TOTAL: KSh ${total}*`;
       window.open(`https://wa.me/254704222666?text=${text}`, "_blank");
@@ -275,42 +278,15 @@ document.addEventListener("DOMContentLoaded", () => {
     else addMessage("Ask me about services, brands, shop, add [id], cart, checkout, booking or contact.", "bot");
   }
 
-  /* ---------- SEND MESSAGE ---------- */
-  send.addEventListener("click", () => {
-    const text = input.value.trim();
-    if (!text) return;
-    addMessage(text, "user");
-    botReply(text);
-    input.value = "";
-  });
+  send.addEventListener("click", () => { const text = input.value.trim(); if (!text) return; addMessage(text, "user"); botReply(text); input.value = ""; });
+  input.addEventListener("keydown", e => { if (e.key === "Enter") send.click(); });
 
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter") send.click();
-  });
+  optionButtons.forEach(btn => { btn.addEventListener("click", () => { addMessage(btn.textContent, "user"); botReply(btn.dataset.option); }); });
 
-  /* ---------- OPTION BUTTONS ---------- */
-  optionButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const option = btn.dataset.option;
-      addMessage(btn.textContent, "user");
-      botReply(option);
-    });
-  });
-
-  /* ---------- PRODUCT CARD CLICK ---------- */
-  document.addEventListener("click", e => {
-    if (e.target.classList.contains("add-to-cart")) addToCart(e.target.dataset.id);
-  });
+  document.addEventListener("click", e => { if (e.target.classList.contains("add-to-cart")) addToCart(e.target.dataset.id); });
 
   /* ================= SMOOTH SCROLL ================= */
-  document.querySelectorAll("nav a").forEach(link => {
-    link.addEventListener("click", e => {
-      e.preventDefault();
-      document.querySelector(link.getAttribute("href"))?.scrollIntoView({ behavior: "smooth" });
-    });
-  });
-
-  renderCart();
+  document.querySelectorAll("nav a").forEach(link => { link.addEventListener("click", e => { e.preventDefault(); document.querySelector(link.getAttribute("href"))?.scrollIntoView({ behavior: "smooth" }); }); });
 
   /* ================= TOAST ================= */
   const toastContainer = document.createElement("div");
@@ -322,5 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toastContainer.classList.add("show");
     setTimeout(() => toastContainer.classList.remove("show"), 2000);
   }
+
+  renderCart();
 
 });
