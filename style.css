@@ -90,7 +90,7 @@ header nav a:hover::after {
   background-size: cover;
   background-position: center;
   opacity: 0;
-  transition: 0.5s;
+  transition: 0.2s;
 }
 
 .slides .slide.active {
