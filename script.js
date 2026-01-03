@@ -106,52 +106,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     brandsSection.appendChild(grid);
   }
+document.addEventListener("DOMContentLoaded", () => {
 
-  /* ================= GLOBAL CART ================= */
+  // ================= PRODUCTS & CART =================
+  let productsList = [
+    { id: 1, name: "Product A", salePrice: 1000 },
+    { id: 2, name: "Product B", salePrice: 2500 },
+    { id: 3, name: "Product C", salePrice: 1500 }
+  ]; // replace or fetch from products.json if needed
+
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  let productsList = [];
 
   function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
   }
 
-  /* ================= LOAD PRODUCTS ================= */
-  fetch("products.json")
-    .then(res => res.json())
-    .then(data => {
-      productsList = data;
-      renderShop(productsList);
-    })
-    .catch(err => console.error(err));
-
-  /* ================= RENDER SHOP ================= */
-  function renderShop(products) {
-    const shopGrid = document.querySelector(".shop-grid");
-    if (!shopGrid) return;
-    shopGrid.innerHTML = "";
-
-    products.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "product-card";
-      card.innerHTML = `
-        <img src="${p.images[0]}" alt="${p.name}">
-        <h3>${p.name}</h3>
-        <p>KSh ${p.salePrice.toLocaleString()}</p>
-        <button class="add-to-cart" data-id="${p.id}">Add to Cart</button>
-      `;
-      shopGrid.appendChild(card);
-    });
-  }
-
-  // Event delegation for Add to Cart buttons
-  document.addEventListener("click", e => {
-    if (e.target.matches(".add-to-cart")) {
-      const productId = Number(e.target.dataset.id);
-      addToCart(productId);
-    }
-  });
-
-  /* ================= CART FUNCTIONS ================= */
+  // ================= ADD TO CART =================
   function addToCart(productId) {
     const product = productsList.find(p => p.id === productId);
     if (!product) return alert("Product not found!");
@@ -164,6 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCart();
   }
 
+  // ================= RENDER CART =================
   function renderCart() {
     const cartItems = document.getElementById("cart-items");
     const cartTotal = document.getElementById("cart-total");
@@ -193,7 +164,8 @@ document.addEventListener("DOMContentLoaded", () => {
     cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()}`;
   }
 
-  function changeQty(id, amount) {
+  // ================= CHANGE QTY =================
+  window.changeQty = function(id, amount) {
     const item = cart.find(i => i.id == id);
     if (!item) return;
     item.quantity += amount;
@@ -202,29 +174,38 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCart();
   }
 
-  function removeItem(id) {
+  // ================= REMOVE ITEM =================
+  window.removeItem = function(id) {
     cart = cart.filter(i => i.id != id);
     saveCart();
     renderCart();
   }
 
-  renderCart();
-
-  /* ================= CHECKOUT ================= */
+  // ================= CHECKOUT =================
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
     if (!cart.length) return alert("Cart is empty!");
 
     let message = "🛒 *New Order*%0A%0A";
     let total = 0;
+
     cart.forEach(item => {
       const subtotal = item.price * item.quantity;
       total += subtotal;
       message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
     });
-    message += `%0A*TOTAL: KSh ${total}*`;
 
+    message += `%0A*TOTAL: KSh ${total}*`;
     window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
   });
+
+  // ================= INITIAL RENDER =================
+  renderCart();
+
+  // ================= EXPOSE ADD TO CART =================
+  window.addToCart = addToCart;
+
+});
+
 
   /* ================= BOOKING FORM ================= */
   const bookingForm = document.getElementById("bookingForm");
