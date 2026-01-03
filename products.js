@@ -1,12 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   const shopGrid = document.querySelector(".shop-grid");
-  if (!shopGrid) return;
+  const modal = document.getElementById("productModal");
 
   fetch("products.json")
-    .then(res => {
-      if (!res.ok) throw new Error("products.json not found");
-      return res.json();
-    })
+    .then(res => res.json())
     .then(products => {
       shopGrid.innerHTML = "";
 
@@ -14,36 +11,43 @@ document.addEventListener("DOMContentLoaded", () => {
         const card = document.createElement("div");
         card.className = "product-card";
 
-        const img = p.images?.[0] || "";
-
         card.innerHTML = `
-          <img src="${img}" alt="${p.name}">
+          <img src="${p.images[0]}" />
           <h3>${p.name}</h3>
-          <p class="price">
-            KSh ${p.salePrice.toLocaleString()}
-            <span class="original-price">
-              KSh ${p.price.toLocaleString()}
-            </span>
-          </p>
-          <p class="desc">${p.shortDescription}</p>
-          <button class="add-cart">Add to Cart</button>
+          <p>KSh ${p.salePrice}</p>
+          <button>View</button>
         `;
 
-        card.querySelector(".add-cart").onclick = () => {
-          const cart = JSON.parse(localStorage.getItem("cart")) || [];
-          cart.push(p);
-          localStorage.setItem("cart", JSON.stringify(cart));
-          alert(`🛒 ${p.name} added to cart`);
-        };
-
+        card.querySelector("button").onclick = () => openModal(p);
         shopGrid.appendChild(card);
       });
-
-      console.log("✅ Shop loaded:", products.length);
-    })
-    .catch(err => {
-      console.error(err);
-      shopGrid.innerHTML =
-        "<p style='color:red;text-align:center;'>❌ Failed to load products</p>";
     });
+
+  function openModal(p) {
+    modal.style.display = "block";
+    modal.querySelector("#modalImg").src = p.images[0];
+    modal.querySelector("#modalName").textContent = p.name;
+    modal.querySelector("#modalDesc").textContent = p.fullDescription;
+    modal.querySelector("#modalPrice").textContent = `KSh ${p.salePrice}`;
+
+    modal.querySelector("#modalWhatsapp").onclick = () => {
+      window.open(
+        `https://wa.me/254704222666?text=I want to buy ${p.name} for KSh ${p.salePrice}`,
+        "_blank"
+      );
+    };
+
+    addToCart(p);
+  }
+
+  document.getElementById("closeModal").onclick = () => {
+    modal.style.display = "none";
+  };
+
+  // CART
+  function addToCart(product) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push({ ...product, qty: 1 });
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
 });
