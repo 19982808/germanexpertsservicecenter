@@ -61,10 +61,10 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Transmission Services", desc: "Fluid changes, repair, and full transmission servicing.", img: "service3.png" },
     { name: "Suspension Services", desc: "Full suspension inspections, repairs, and replacements.", img: "service4.png" },
     { name: "Body Works & Paint", desc: "High-quality bodywork repairs and paint restoration.", img: "service5.png" },
-    { name: "Car Pre-Purchase Inspection", desc: "Detailed inspections for buying used German cars.", img: "service5.png" },
-    { name: "Online Coding & Software Upgrades", desc: "Vehicle software updates and ECU programming.", img: "service6.png" },
-    { name: "Key Duplication", desc: "Secure and reliable key duplication for all models.", img: "service7.png" },
-    { name: "Interior Works", desc: "Repairs, restoration, and upgrades for interiors.", img: "service8.png" }
+    { name: "Car Pre-Purchase Inspection", desc: "Detailed inspections for buying used German cars.", img: "service6.png" },
+    { name: "Online Coding & Software Upgrades", desc: "Vehicle software updates and ECU programming.", img: "service7.png" },
+    { name: "Key Duplication", desc: "Secure and reliable key duplication for all models.", img: "service8.png" },
+    { name: "Interior Works", desc: "Repairs, restoration, and upgrades for interiors.", img: "service9.png" }
   ];
 
   const serviceSection = document.querySelector("#services .service-grid");
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= BRANDS ================= */
   const brands = [
     { name: "Audi", img: "audi.png", page: "audi.html" },
-    { name: "BMW", img: "bmw.png", page: "bmw.html" },
+    { name: "BMW", img: "bmw2.png", page: "bmw.html" },
     { name: "Mercedes", img: "mercedes-benz.png", page: "mercedes.html" },
     { name: "Volkswagen", img: "volkswagen.png", page: "volkswagen.html" },
     { name: "Porsche", img: "porsche.png", page: "porsche.html" },
