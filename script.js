@@ -215,102 +215,147 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderCart();
-/* ================= FRANCO CHATBOT ================= */
+/* ================= FRANCO CHATBOT (FIXED) ================= */
 
 const chatBox = document.getElementById("chatbot-container");
 const toggle = document.getElementById("chatbot-toggle");
-const close = document.getElementById("chatbot-close");
+const closeBtn = document.getElementById("chatbot-close");
 const messages = document.getElementById("chatbot-messages");
 const input = document.getElementById("chatbot-input");
 const send = document.getElementById("chatbot-send");
+const optionButtons = document.querySelectorAll("#chatbot-options button");
 
-// Function to toggle the chatbot visibility
-toggle.onclick = () => {
-    chatBox.style.display = "flex";
-};
-
-close.onclick = () => {
-    chatBox.style.display = "none";
-};
-
-// Function to add messages to the chat
-function addMessage(text, type) {
-    const div = document.createElement("div");
-    div.className = `message ${type}`;
-    div.innerHTML = text;
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight; // Scroll to the bottom
-}
-
-// Function to handle bot replies based on user input
-function botReply(msg) {
-    msg = msg.toLowerCase();
-
-    if (msg.includes("hi") || msg.includes("hello")) {
-        addMessage("Hello 👋 How can I help you today?", "bot");
-    } else if (msg.includes("service")) {
-        servicesData.forEach(s => addMessage(`<strong>${s.name}</strong><br><img src="images/${s.img}" width="100"><br>${s.desc}`, "bot"));
-    } else if (msg.includes("brand") || msg.includes("brands")) {
-        brands.forEach(b => addMessage(`<strong>${b.name}</strong><br><img src="images/${b.img}" width="100"><br>Click to open: <a href="${b.page}">${b.name} Page</a>`, "bot"));
-    } else if (msg.includes("shop") || msg.includes("products")) {
-        productsList.forEach(p => addMessage(`<strong>${p.name}</strong><br>KSh ${p.salePrice.toLocaleString()}<br><img src="images/${p.images[0]}" width="100"><br>ID: ${p.id}`, "bot"));
-    } else if (msg.includes("add")) {
-        const match = msg.match(/add (\S+)/);
-        if (match) {
-            const productId = match[1];
-            addToCart(productId);
-            addMessage("✅ Product added to your cart.", "bot");
-        } else {
-            addMessage("Please specify a product ID like: 'Add bmw-x6-f16-air-struts'", "bot");
-        }
-    } else if (msg.includes("cart")) {
-        if (!cart.length) {
-            return addMessage("Your cart is empty 🛒", "bot");
-        }
-        let cartText = "<strong>Your Cart:</strong><br>";
-        let total = 0;
-        cart.forEach(item => {
-            total += item.price * item.quantity;
-            cartText += `${item.name} x${item.quantity} — KSh ${item.price * item.quantity}<br>`;
-        });
-        cartText += `<br><strong>Total: KSh ${total}</strong>`;
-        addMessage(cartText, "bot");
-    } else if (msg.includes("checkout")) {
-        if (!cart.length) {
-            return addMessage("Your cart is empty 🛒", "bot");
-        }
-        let message = "🛒 *New Order*%0A%0A";
-        let total = 0;
-        cart.forEach(item => {
-            total += item.price * item.quantity;
-            message += `• ${item.name} x${item.quantity} — KSh ${item.price * item.quantity}%0A`;
-        });
-        message += `%0A*TOTAL: KSh ${total}*`;
-        window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
-        addMessage("Opening WhatsApp for checkout 🟢", "bot");
-    } else if (msg.includes("contact")) {
-        addMessage("📞 0704 222 666<br>📍 Ngong Road, Kiambu & Karen", "bot");
-    } else if (msg.includes("booking")) {
-        addMessage("To book, fill the form above or type the service name.", "bot");
-    } else {
-        addMessage("Ask me about services, brands, shop, cart, add [id], checkout, booking or contact.", "bot");
-    }
-}
-
-// Event listener for sending user messages
-send.onclick = () => {
-    const userMessage = input.value.trim();
-    if (!userMessage) return; // Ignore empty messages
-    addMessage(userMessage, "user");
-    botReply(userMessage); // Call the bot reply function
-    input.value = ""; // Clear the input field
-};
-
-// Event listener for sending messages with the Enter key
-input.addEventListener("keypress", e => {
-    if (e.key === "Enter") send.click();
+/* ---------- OPEN / CLOSE ---------- */
+toggle.addEventListener("click", () => {
+  chatBox.classList.remove("hidden");
 });
 
+closeBtn.addEventListener("click", () => {
+  chatBox.classList.add("hidden");
+});
+
+/* ---------- ADD MESSAGE ---------- */
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = `message ${type}`;
+  div.innerHTML = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+/* ---------- BOT LOGIC ---------- */
+function botReply(msg) {
+  msg = msg.toLowerCase();
+
+  if (msg.includes("hi") || msg.includes("hello")) {
+    addMessage("Hello 👋 How can I help you today?", "bot");
+
+  } else if (msg.includes("service")) {
+    servicesData.forEach(s =>
+      addMessage(
+        `<strong>${s.name}</strong><br>
+         <img src="images/${s.img}" width="100"><br>
+         ${s.desc}`,
+        "bot"
+      )
+    );
+
+  } else if (msg.includes("brand")) {
+    brands.forEach(b =>
+      addMessage(
+        `<strong>${b.name}</strong><br>
+         <img src="images/${b.img}" width="100"><br>
+         <a href="${b.page}" target="_blank">Open ${b.name}</a>`,
+        "bot"
+      )
+    );
+
+  } else if (msg.includes("shop") || msg.includes("products")) {
+    productsList.forEach(p =>
+      addMessage(
+        `<strong>${p.name}</strong><br>
+         KSh ${p.salePrice.toLocaleString()}<br>
+         <img src="images/${p.images[0]}" width="100"><br>
+         ID: ${p.id}`,
+        "bot"
+      )
+    );
+
+  } else if (msg.startsWith("add ")) {
+    const productId = msg.replace("add ", "");
+    addToCart(productId);
+    addMessage("✅ Product added to your cart.", "bot");
+
+  } else if (msg.includes("cart")) {
+    if (!cart.length) {
+      addMessage("Your cart is empty 🛒", "bot");
+      return;
+    }
+
+    let total = 0;
+    let cartText = "<strong>Your Cart:</strong><br>";
+
+    cart.forEach(item => {
+      total += item.price * item.quantity;
+      cartText += `${item.name} x${item.quantity} — KSh ${item.price * item.quantity}<br>`;
+    });
+
+    cartText += `<br><strong>Total: KSh ${total}</strong>`;
+    addMessage(cartText, "bot");
+
+  } else if (msg.includes("checkout")) {
+    if (!cart.length) {
+      addMessage("Your cart is empty 🛒", "bot");
+      return;
+    }
+
+    let text = "🛒 *New Order*%0A%0A";
+    let total = 0;
+
+    cart.forEach(item => {
+      total += item.price * item.quantity;
+      text += `• ${item.name} x${item.quantity} — KSh ${item.price * item.quantity}%0A`;
+    });
+
+    text += `%0A*TOTAL: KSh ${total}*`;
+    window.open(`https://wa.me/254704222666?text=${text}`, "_blank");
+    addMessage("Opening WhatsApp for checkout 🟢", "bot");
+
+  } else if (msg.includes("contact")) {
+    addMessage("📞 0704 222 666<br>📍 Ngong Road, Kiambu & Karen", "bot");
+
+  } else if (msg.includes("booking")) {
+    addMessage("To book, type the service name or use the form above.", "bot");
+
+  } else {
+    addMessage(
+      "Ask me about services, brands, shop, add [id], cart, checkout, booking or contact.",
+      "bot"
+    );
+  }
+}
+
+/* ---------- SEND MESSAGE ---------- */
+send.addEventListener("click", () => {
+  const text = input.value.trim();
+  if (!text) return;
+  addMessage(text, "user");
+  botReply(text);
+  input.value = "";
+});
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") send.click();
+});
+
+/* ---------- OPTION BUTTONS ---------- */
+optionButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const option = btn.dataset.option;
+    addMessage(btn.textContent, "user");
+    botReply(option);
+  });
+});
 
   
   /* ================= SMOOTH SCROLL ================= */
