@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div");
       card.className = "service-card";
       card.innerHTML = `
-        <img src="images/${s.img}" alt="${s.name}">
+        <img src="${s.img}" alt="${s.name}">
         <h3>${s.name}</h3>
         <p>${s.desc}</p>
       `;
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     brands.forEach(b => {
       const card = document.createElement("div");
       card.className = "brand-card";
-      card.innerHTML = `<img src="images/${b.img}" alt="${b.name}"><p>${b.name}</p>`;
+      card.innerHTML = `<img src="${b.img}" alt="${b.name}"><p>${b.name}</p>`;
       card.style.cursor = "pointer";
       card.addEventListener("click", () => { window.location.href = b.page; });
       grid.appendChild(card);
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= GLOBAL CART ================= */
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  let productsList = []; // store JSON globally once
+  let productsList = []; // store JSON globally
 
   function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div");
       card.className = "product-card";
       card.innerHTML = `
-        <img src="images/${p.images[0]}" alt="${p.name}">
+        <img src="${p.images[0]}" alt="${p.name}">
         <h3>${p.name}</h3>
         <p>KSh ${p.salePrice.toLocaleString()}</p>
         <button onclick="addToCart(${p.id})">Add to Cart</button>
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
       total += subtotal;
       cartItems.innerHTML += `
         <div class="cart-item">
-          <img src="images/${item.image}" width="50">
+          <img src="${item.image}" width="50">
           <strong>${item.name}</strong>
           <div class="qty">
             <button onclick="changeQty('${item.id}', -1)">−</button>
@@ -250,13 +250,13 @@ document.addEventListener("DOMContentLoaded", () => {
     msg = msg.toLowerCase();
     if (msg.includes("hi") || msg.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
     else if (msg.includes("service")) {
-      servicesData.forEach(s => addMessage(`<strong>${s.name}</strong><br><img src="images/${s.img}" width="100"><br>${s.desc}`, "bot"));
+      servicesData.forEach(s => addMessage(`<strong>${s.name}</strong><br><img src="${s.img}" width="100"><br>${s.desc}`, "bot"));
     }
     else if (msg.includes("brand") || msg.includes("brands")) {
-      brands.forEach(b => addMessage(`<strong>${b.name}</strong><br><img src="images/${b.img}" width="100"><br>Click to open: <a href="${b.page}">${b.name} Page</a>`, "bot"));
+      brands.forEach(b => addMessage(`<strong>${b.name}</strong><br><img src="${b.img}" width="100"><br>Click to open: <a href="${b.page}">${b.name} Page</a>`, "bot"));
     }
     else if (msg.includes("shop") || msg.includes("products")) {
-      productsList.slice(0, 3).forEach(p => addMessage(`<strong>${p.name}</strong><br><img src="images/${p.images[0]}" width="100"><br>KSh ${p.salePrice}`, "bot"));
+      productsList.slice(0, 3).forEach(p => addMessage(`<strong>${p.name}</strong><br><img src="${p.images[0]}" width="100"><br>KSh ${p.salePrice}`, "bot"));
     }
     else if (msg.includes("contact")) addMessage("📞 0704 222 666<br>📍 Ngong Road, Kiambu & Karen", "bot");
     else if (msg.includes("booking")) addMessage("To book, fill the form above or type service name.", "bot");
