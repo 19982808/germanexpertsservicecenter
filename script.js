@@ -299,9 +299,10 @@ function botReply(msg) {
 
 // Event listener for sending user messages
 send.onclick = () => {
-    if (!input.value.trim()) return; // Ignore empty messages
-    addMessage(input.value, "user");
-    botReply(input.value); // Call the bot reply function
+    const userMessage = input.value.trim();
+    if (!userMessage) return; // Ignore empty messages
+    addMessage(userMessage, "user");
+    botReply(userMessage); // Call the bot reply function
     input.value = ""; // Clear the input field
 };
 
@@ -309,6 +310,7 @@ send.onclick = () => {
 input.addEventListener("keypress", e => {
     if (e.key === "Enter") send.click();
 });
+
 
   
   /* ================= SMOOTH SCROLL ================= */
