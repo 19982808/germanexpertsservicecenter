@@ -80,6 +80,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
     brandsSection.appendChild(grid);
   }
+ /* ================= CART ================= */
+  function loadCart() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const container = document.getElementById("cartItems");
+  const totalEl = document.getElementById("cartTotal");
+
+  if (!container) return;
+
+  container.innerHTML = "";
+  let total = 0;
+
+  cart.forEach((p, i) => {
+    total += p.salePrice * p.qty;
+    container.innerHTML += `
+      <div>
+        ${p.name} × ${p.qty} — KSh ${p.salePrice * p.qty}
+      </div>
+    `;
+  });
+
+  totalEl.textContent = `TOTAL: KSh ${total}`;
+}
+
+loadCart();
 
   /* ================= BOOKING → WHATSAPP ================= */
   const bookingForm = document.getElementById("bookingForm");
