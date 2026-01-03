@@ -106,14 +106,130 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     brandsSection.appendChild(grid);
   }
+/* ================= GLOBAL CART ================= */
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let productsList = []; // loaded from products.json
 
-  /* ================= GLOBAL CART ================= */
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  let productsList = []; // store JSON globally
+function saveCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
 
-  function saveCart() {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }
+/* ================= FETCH PRODUCTS ================= */
+fetch("products.json")
+  .then(res => res.json())
+  .then(data => {
+    productsList = data;
+    renderShop(productsList);
+  })
+  .catch(err => console.error(err));
+
+/* ================= RENDER SHOP ================= */
+function renderShop(products) {
+  const shopGrid = document.querySelector(".shop-grid");
+  if (!shopGrid) return;
+  shopGrid.innerHTML = "";
+
+  products.forEach(p => {
+    const productImage = p.images && p.images[0] ? p.images[0] : "default-product.png";
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <img src="${productImage}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>KSh ${p.salePrice.toLocaleString()}</p>
+      <button onclick="addToCart(${p.id})">Add to Cart</button>
+      <button onclick="addToCartFromChat(${p.id})">💬 Chatbot Add</button>
+    `;
+    shopGrid.appendChild(card);
+  });
+}
+
+/* ================= CART FUNCTIONS ================= */
+function addToCart(productId) {
+  const product = productsList.find(p => p.id == productId);
+  if (!product) return;
+
+  const existing = cart.find(i => i.id == product.id);
+  const productImage = product.images && product.images[0] ? product.images[0] : "default-product.png";
+
+  if (existing) existing.quantity += 1;
+  else cart.push({ id: product.id, name: product.name, price: product.salePrice, image: productImage, quantity: 1 });
+
+  saveCart();
+  renderCart();
+}
+
+function addToCartFromChat(productId) {
+  addToCart(productId);
+}
+
+function renderCart() {
+  const cartItems = document.getElementById("cart-items");
+  const cartTotal = document.getElementById("cart-total");
+  if (!cartItems || !cartTotal) return;
+
+  cartItems.innerHTML = "";
+  let total = 0;
+  let count = 0;
+
+  cart.forEach(item => {
+    const subtotal = item.price * item.quantity;
+    total += subtotal;
+    count += item.quantity;
+    const itemImage = item.image || "default-product.png";
+    cartItems.innerHTML += `
+      <div class="cart-item">
+        <img src="${itemImage}" width="50">
+        <strong>${item.name}</strong>
+        <div class="qty">
+          <button onclick="changeQty('${item.id}', -1)">−</button>
+          <span>${item.quantity}</span>
+          <button onclick="changeQty('${item.id}', 1)">+</button>
+        </div>
+        <span>KSh ${subtotal.toLocaleString()}</span>
+        <button onclick="removeItem('${item.id}')">🗑</button>
+      </div>
+    `;
+  });
+
+  cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()} (${count} items)`;
+}
+
+/* ================= CHANGE QUANTITY ================= */
+function changeQty(id, amount) {
+  const item = cart.find(i => i.id == id);
+  if (!item) return;
+  item.quantity += amount;
+  if (item.quantity <= 0) cart = cart.filter(i => i.id != id);
+  saveCart();
+  renderCart();
+}
+
+function removeItem(id) {
+  cart = cart.filter(i => i.id != id);
+  saveCart();
+  renderCart();
+}
+
+renderCart();
+
+/* ================= WHATSAPP CHECKOUT ================= */
+document.getElementById("checkoutBtn")?.addEventListener("click", () => {
+  if (!cart.length) return alert("Cart is empty!");
+
+  let message = "🛒 *New Order*%0A%0A";
+  let total = 0;
+
+  cart.forEach(item => {
+    const subtotal = item.price * item.quantity;
+    total += subtotal;
+    message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
+  });
+
+  message += `%0A*TOTAL: KSh ${total}*`;
+  window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
+});
+
 
   /* ================= SHOP PRODUCTS ================= */
   fetch("products.json")
@@ -228,49 +344,117 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ================= FRANCO CHATBOT ================= */
-  const chatBox = document.getElementById("chatbot-container");
-  const toggle = document.getElementById("chatbot-toggle");
-  const close = document.getElementById("chatbot-close");
-  const messages = document.getElementById("chatbot-messages");
-  const input = document.getElementById("chatbot-input");
-  const send = document.getElementById("chatbot-send");
+const chatBox = document.getElementById("chatbot-container");
+const toggle = document.getElementById("chatbot-toggle");
+const close = document.getElementById("chatbot-close");
+const messages = document.getElementById("chatbot-messages");
+const input = document.getElementById("chatbot-input");
+const send = document.getElementById("chatbot-send");
 
-  toggle.onclick = () => chatBox.style.display = "flex";
-  close.onclick = () => chatBox.style.display = "none";
+toggle.onclick = () => chatBox.style.display = "flex";
+close.onclick = () => chatBox.style.display = "none";
 
-  function addMessage(text, type) {
-    const div = document.createElement("div");
-    div.className = `message ${type}`;
-    div.innerHTML = text;
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = `message ${type}`;
+  div.innerHTML = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function botReply(msg) {
+  msg = msg.toLowerCase();
+
+  if (msg.includes("hi") || msg.includes("hello")) {
+    addMessage("Hello 👋 How can I help you today?", "bot");
   }
-
-  function botReply(msg) {
-    msg = msg.toLowerCase();
-    if (msg.includes("hi") || msg.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
-    else if (msg.includes("service")) {
-      servicesData.forEach(s => addMessage(`<strong>${s.name}</strong><br><img src="${s.img}" width="100"><br>${s.desc}`, "bot"));
-    }
-    else if (msg.includes("brand") || msg.includes("brands")) {
-      brands.forEach(b => addMessage(`<strong>${b.name}</strong><br><img src="${b.img}" width="100"><br>Click to open: <a href="${b.page}">${b.name} Page</a>`, "bot"));
-    }
-    else if (msg.includes("shop") || msg.includes("products")) {
-      productsList.slice(0, 3).forEach(p => addMessage(`<strong>${p.name}</strong><br><img src="${p.images[0]}" width="100"><br>KSh ${p.salePrice}`, "bot"));
-    }
-    else if (msg.includes("contact")) addMessage("📞 0704 222 666<br>📍 Ngong Road, Kiambu & Karen", "bot");
-    else if (msg.includes("booking")) addMessage("To book, fill the form above or type service name.", "bot");
-    else addMessage("Ask me about services, brands, shop, booking or contact.", "bot");
+  else if (msg.includes("service")) {
+    servicesData.forEach(s => {
+      addMessage(`
+        <strong>${s.name}</strong><br>
+        <img src="${s.img}" width="100"><br>
+        ${s.desc}
+      `, "bot");
+    });
   }
+  else if (msg.includes("brand") || msg.includes("brands")) {
+    brands.forEach(b => {
+      addMessage(`
+        <strong>${b.name}</strong><br>
+        <img src="${b.img}" width="100"><br>
+        Click to open: <a href="${b.page}">${b.name} Page</a>
+      `, "bot");
+    });
+  }
+  else if (msg.includes("shop") || msg.includes("products")) {
+    productsList.slice(0, 5).forEach(p => {
+      addMessage(`
+        <strong>${p.name}</strong><br>
+        <img src="${p.images[0]}" width="100"><br>
+        KSh ${p.salePrice}<br>
+        <button onclick="addToCartFromChat(${p.id})">Add to Cart</button>
+      `, "bot");
+    });
+  }
+  else if (msg.includes("add")) {
+    const match = msg.match(/add (\d+)/);
+    if (match) {
+      const productId = Number(match[1]);
+      addToCart(productId);
+      addMessage("✅ Product added to your cart.", "bot");
+    } else {
+      addMessage("Please specify a product ID like: 'Add 3'", "bot");
+    }
+  }
+  else if (msg.includes("cart")) {
+    if (!cart.length) return addMessage("Your cart is empty 🛒", "bot");
+    let cartText = "<strong>Your Cart:</strong><br>";
+    let total = 0;
+    cart.forEach(item => {
+      const subtotal = item.price * item.quantity;
+      total += subtotal;
+      cartText += `
+        ${item.name} x${item.quantity} — KSh ${subtotal}<br>
+      `;
+    });
+    cartText += `<br><strong>Total: KSh ${total}</strong>`;
+    addMessage(cartText, "bot");
+  }
+  else if (msg.includes("checkout")) {
+    if (!cart.length) return addMessage("Your cart is empty 🛒", "bot");
 
-  send.onclick = () => {
-    if (!input.value.trim()) return;
-    addMessage(input.value, "user");
-    botReply(input.value);
-    input.value = "";
-  };
+    let message = "🛒 *New Order*%0A%0A";
+    let total = 0;
+    cart.forEach(item => {
+      const subtotal = item.price * item.quantity;
+      total += subtotal;
+      message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
+    });
+    message += `%0A*TOTAL: KSh ${total}*`;
+    window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
+    addMessage("Opening WhatsApp for checkout 🟢", "bot");
+  }
+  else if (msg.includes("contact")) {
+    addMessage("📞 0704 222 666<br>📍 Ngong Road, Kiambu & Karen", "bot");
+  }
+  else if (msg.includes("booking")) {
+    addMessage("To book, fill the form above or type the service name.", "bot");
+  }
+  else {
+    addMessage("Ask me about services, brands, shop, cart, add [id], checkout, booking or contact.", "bot");
+  }
+}
 
-  input.addEventListener("keypress", e => { if (e.key === "Enter") send.click(); });
+send.onclick = () => {
+  if (!input.value.trim()) return;
+  addMessage(input.value, "user");
+  botReply(input.value);
+  input.value = "";
+};
+
+input.addEventListener("keypress", e => {
+  if (e.key === "Enter") send.click();
+});
 
   /* ================= SMOOTH SCROLL ================= */
   document.querySelectorAll("nav a").forEach(link => {
