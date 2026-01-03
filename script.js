@@ -215,24 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderCart();
-
-  /* ================= BOOKING FORM ================= */
-  const bookingForm = document.getElementById("bookingForm");
-  const popup = document.getElementById("confirmationPopup");
-  bookingForm?.addEventListener("submit", e => {
-    e.preventDefault();
-    const text = encodeURIComponent(
-      `Booking Request\nName: ${name.value}\nPhone: ${phone.value}\nService: ${service.value}\nMessage: ${message.value}`
-    );
-    popup.style.display = "block";
-    setTimeout(() => {
-      window.open(`https://wa.me/254704222666?text=${text}`, "_blank");
-      popup.style.display = "none";
-      bookingForm.reset();
-    }, 1000);
-  });
-
- /* ================= FRANCO CHATBOT ================= */
+/* ================= FRANCO CHATBOT ================= */
 
 const chatBox = document.getElementById("chatbot-container");
 const toggle = document.getElementById("chatbot-toggle");
@@ -327,6 +310,7 @@ input.addEventListener("keypress", e => {
     if (e.key === "Enter") send.click();
 });
 
+  
   /* ================= SMOOTH SCROLL ================= */
   document.querySelectorAll("nav a").forEach(link => {
     link.addEventListener("click", e => {
