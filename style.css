@@ -36,8 +36,8 @@ header {
 }
 
 header .logo {
-  max-height: 100px; /* fixed max height */
-  width: auto;      /* maintain aspect ratio */
+  max-height: 150px; /* fixed max height */
+  width: 200px;      /* maintain aspect ratio */
   display: block;
 }
 
