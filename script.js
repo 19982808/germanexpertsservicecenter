@@ -108,59 +108,36 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 /* ================= GLOBAL CART ================= */
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let productsList = []; // loaded from products.json
+let productsList = []; // store JSON once
 
 function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-/* ================= FETCH PRODUCTS ================= */
+/* ================= LOAD PRODUCTS ================= */
 fetch("products.json")
   .then(res => res.json())
   .then(data => {
     productsList = data;
-    renderShop(productsList);
   })
   .catch(err => console.error(err));
-
-/* ================= RENDER SHOP ================= */
-function renderShop(products) {
-  const shopGrid = document.querySelector(".shop-grid");
-  if (!shopGrid) return;
-  shopGrid.innerHTML = "";
-
-  products.forEach(p => {
-    const productImage = p.images && p.images[0] ? p.images[0] : "default-product.png";
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.innerHTML = `
-      <img src="${productImage}" alt="${p.name}">
-      <h3>${p.name}</h3>
-      <p>KSh ${p.salePrice.toLocaleString()}</p>
-      <button onclick="addToCart(${p.id})">Add to Cart</button>
-      <button onclick="addToCartFromChat(${p.id})">💬 Chatbot Add</button>
-    `;
-    shopGrid.appendChild(card);
-  });
-}
 
 /* ================= CART FUNCTIONS ================= */
 function addToCart(productId) {
   const product = productsList.find(p => p.id == productId);
-  if (!product) return;
+  if (!product) return alert("Product not found!");
 
   const existing = cart.find(i => i.id == product.id);
-  const productImage = product.images && product.images[0] ? product.images[0] : "default-product.png";
-
   if (existing) existing.quantity += 1;
-  else cart.push({ id: product.id, name: product.name, price: product.salePrice, image: productImage, quantity: 1 });
+  else cart.push({
+    id: product.id,
+    name: product.name,
+    price: product.salePrice,
+    quantity: 1
+  });
 
   saveCart();
   renderCart();
-}
-
-function addToCartFromChat(productId) {
-  addToCart(productId);
 }
 
 function renderCart() {
@@ -170,16 +147,13 @@ function renderCart() {
 
   cartItems.innerHTML = "";
   let total = 0;
-  let count = 0;
 
   cart.forEach(item => {
     const subtotal = item.price * item.quantity;
     total += subtotal;
-    count += item.quantity;
-    const itemImage = item.image || "default-product.png";
+
     cartItems.innerHTML += `
       <div class="cart-item">
-        <img src="${itemImage}" width="50">
         <strong>${item.name}</strong>
         <div class="qty">
           <button onclick="changeQty('${item.id}', -1)">−</button>
@@ -192,10 +166,9 @@ function renderCart() {
     `;
   });
 
-  cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()} (${count} items)`;
+  cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()}`;
 }
 
-/* ================= CHANGE QUANTITY ================= */
 function changeQty(id, amount) {
   const item = cart.find(i => i.id == id);
   if (!item) return;
@@ -211,24 +184,29 @@ function removeItem(id) {
   renderCart();
 }
 
-renderCart();
-
-/* ================= WHATSAPP CHECKOUT ================= */
+/* ================= CHECKOUT ================= */
 document.getElementById("checkoutBtn")?.addEventListener("click", () => {
   if (!cart.length) return alert("Cart is empty!");
 
   let message = "🛒 *New Order*%0A%0A";
   let total = 0;
-
   cart.forEach(item => {
     const subtotal = item.price * item.quantity;
     total += subtotal;
     message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
   });
-
   message += `%0A*TOTAL: KSh ${total}*`;
+
   window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
 });
+
+/* ================= INITIAL RENDER ================= */
+renderCart();
+
+ 
+
+
+
 
 
   /* ================= SHOP PRODUCTS ================= */
