@@ -163,6 +163,23 @@ loadCart();
   input.addEventListener("keypress", e => {
     if (e.key === "Enter") send.click();
   });
+function showProductsInChat() {
+  fetch("products.json")
+    .then(r => r.json())
+    .then(products => {
+      const box = document.getElementById("chatbot-messages");
+
+      products.slice(0,3).forEach(p => {
+        box.innerHTML += `
+          <div class="bot-message">
+            <img src="${p.images[0]}" style="width:100%;border-radius:8px">
+            <strong>${p.name}</strong><br>
+            KSh ${p.salePrice}
+          </div>
+        `;
+      });
+    });
+}
 
   /* ================= SMOOTH SCROLL ================= */
   document.querySelectorAll("nav a").forEach(link => {
