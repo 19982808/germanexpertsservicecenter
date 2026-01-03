@@ -110,11 +110,23 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= PRODUCTS & CART ================= */
   const shopGrid = document.querySelector("#shop .shop-grid");
   let productsList = [];
-
-  cart = JSON.parse(localStorage.getItem("cart")) || [];
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
+  }
+
+  function addToCart(productId) {
+    const product = productsList.find(p => p.id === productId);
+    if (!product) return alert("Product not found!");
+
+    const existing = cart.find(i => i.id === product.id);
+    if (existing) existing.quantity += 1;
+    else cart.push({ id: product.id, name: product.name, price: product.salePrice, quantity: 1 });
+
+    saveCart();
+    renderCart();
+    showToast(`${product.name} added to cart`);
   }
 
   function renderShop() {
@@ -127,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <img src="images/${p.images[0]}" alt="${p.name}">
         <h3>${p.name}</h3>
         <p>KSh ${p.salePrice.toLocaleString()}</p>
-        <button onclick="addToCart('${p.id}')">Add to Cart</button>
+        <button class="add-to-cart" data-id="${p.id}">Add to Cart</button>
       `;
       shopGrid.appendChild(card);
     });
@@ -144,22 +156,16 @@ document.addEventListener("DOMContentLoaded", () => {
       shopGrid.innerHTML = "<p>Failed to load products.</p>";
     });
 
-  function addToCart(productId) {
-    const product = productsList.find(p => p.id === productId);
-    if (!product) return alert("Product not found!");
-
-    const existing = cart.find(i => i.id === product.id);
-    if (existing) existing.quantity += 1;
-    else cart.push({ id: product.id, name: product.name, price: product.salePrice, quantity: 1 });
-
-    saveCart();
-    renderCart();
-  }
-
   function renderCart() {
     const cartItems = document.getElementById("cart-items");
     const cartTotal = document.getElementById("cart-total");
     if (!cartItems || !cartTotal) return;
+
+    if (!cart.length) {
+      cartItems.innerHTML = "";
+      cartTotal.textContent = "KSh 0";
+      return;
+    }
 
     cartItems.innerHTML = "";
     let total = 0;
@@ -167,7 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cart.forEach(item => {
       const subtotal = item.price * item.quantity;
       total += subtotal;
-
       cartItems.innerHTML += `
         <div class="cart-item">
           <strong>${item.name}</strong>
@@ -185,7 +190,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()}`;
   }
 
-  window.addToCart = addToCart;
   window.changeQty = function(id, amount) {
     const item = cart.find(i => i.id == id);
     if (!item) return;
@@ -215,149 +219,89 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderCart();
-/* ================= FRANCO CHATBOT (FIXED) ================= */
 
-const chatBox = document.getElementById("chatbot-container");
-const toggle = document.getElementById("chatbot-toggle");
-const closeBtn = document.getElementById("chatbot-close");
-const messages = document.getElementById("chatbot-messages");
-const input = document.getElementById("chatbot-input");
-const send = document.getElementById("chatbot-send");
-const optionButtons = document.querySelectorAll("#chatbot-options button");
+  /* ================= CHATBOT ================= */
+  const chatBox = document.getElementById("chatbot-container");
+  const toggle = document.getElementById("chatbot-toggle");
+  const closeBtn = document.getElementById("chatbot-close");
+  const messages = document.getElementById("chatbot-messages");
+  const input = document.getElementById("chatbot-input");
+  const send = document.getElementById("chatbot-send");
+  const optionButtons = document.querySelectorAll("#chatbot-options button");
 
-/* ---------- OPEN / CLOSE ---------- */
-toggle.addEventListener("click", () => {
-  chatBox.classList.remove("hidden");
-});
+  /* ---------- OPEN / CLOSE ---------- */
+  toggle.addEventListener("click", () => chatBox.classList.remove("hidden"));
+  closeBtn.addEventListener("click", () => chatBox.classList.add("hidden"));
 
-closeBtn.addEventListener("click", () => {
-  chatBox.classList.add("hidden");
-});
-
-/* ---------- ADD MESSAGE ---------- */
-function addMessage(text, type) {
-  const div = document.createElement("div");
-  div.className = `message ${type}`;
-  div.innerHTML = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-/* ---------- BOT LOGIC ---------- */
-function botReply(msg) {
-  msg = msg.toLowerCase();
-
-  if (msg.includes("hi") || msg.includes("hello")) {
-    addMessage("Hello 👋 How can I help you today?", "bot");
-
-  } else if (msg.includes("service")) {
-    servicesData.forEach(s =>
-      addMessage(
-        `<strong>${s.name}</strong><br>
-         <img src="images/${s.img}" width="100"><br>
-         ${s.desc}`,
-        "bot"
-      )
-    );
-
-  } else if (msg.includes("brand")) {
-    brands.forEach(b =>
-      addMessage(
-        `<strong>${b.name}</strong><br>
-         <img src="images/${b.img}" width="100"><br>
-         <a href="${b.page}" target="_blank">Open ${b.name}</a>`,
-        "bot"
-      )
-    );
-
-  } else if (msg.includes("shop") || msg.includes("products")) {
-    productsList.forEach(p =>
-      addMessage(
-        `<strong>${p.name}</strong><br>
-         KSh ${p.salePrice.toLocaleString()}<br>
-         <img src="images/${p.images[0]}" width="100"><br>
-         ID: ${p.id}`,
-        "bot"
-      )
-    );
-
-  } else if (msg.startsWith("add ")) {
-    const productId = msg.replace("add ", "");
-    addToCart(productId);
-    addMessage("✅ Product added to your cart.", "bot");
-
-  } else if (msg.includes("cart")) {
-    if (!cart.length) {
-      addMessage("Your cart is empty 🛒", "bot");
-      return;
-    }
-
-    let total = 0;
-    let cartText = "<strong>Your Cart:</strong><br>";
-
-    cart.forEach(item => {
-      total += item.price * item.quantity;
-      cartText += `${item.name} x${item.quantity} — KSh ${item.price * item.quantity}<br>`;
-    });
-
-    cartText += `<br><strong>Total: KSh ${total}</strong>`;
-    addMessage(cartText, "bot");
-
-  } else if (msg.includes("checkout")) {
-    if (!cart.length) {
-      addMessage("Your cart is empty 🛒", "bot");
-      return;
-    }
-
-    let text = "🛒 *New Order*%0A%0A";
-    let total = 0;
-
-    cart.forEach(item => {
-      total += item.price * item.quantity;
-      text += `• ${item.name} x${item.quantity} — KSh ${item.price * item.quantity}%0A`;
-    });
-
-    text += `%0A*TOTAL: KSh ${total}*`;
-    window.open(`https://wa.me/254704222666?text=${text}`, "_blank");
-    addMessage("Opening WhatsApp for checkout 🟢", "bot");
-
-  } else if (msg.includes("contact")) {
-    addMessage("📞 0704 222 666<br>📍 Ngong Road, Kiambu & Karen", "bot");
-
-  } else if (msg.includes("booking")) {
-    addMessage("To book, type the service name or use the form above.", "bot");
-
-  } else {
-    addMessage(
-      "Ask me about services, brands, shop, add [id], cart, checkout, booking or contact.",
-      "bot"
-    );
+  /* ---------- ADD MESSAGE ---------- */
+  function addMessage(text, type) {
+    const div = document.createElement("div");
+    div.className = `message ${type}`;
+    div.innerHTML = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
   }
-}
 
-/* ---------- SEND MESSAGE ---------- */
-send.addEventListener("click", () => {
-  const text = input.value.trim();
-  if (!text) return;
-  addMessage(text, "user");
-  botReply(text);
-  input.value = "";
-});
+  /* ---------- BOT LOGIC ---------- */
+  function botReply(msg) {
+    msg = msg.toLowerCase();
 
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") send.click();
-});
+    if (msg.includes("hi") || msg.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
+    else if (msg.includes("service")) servicesData.forEach(s => addMessage(`<strong>${s.name}</strong><br><img src="images/${s.img}" width="100"><br>${s.desc}`, "bot"));
+    else if (msg.includes("brand")) brands.forEach(b => addMessage(`<strong>${b.name}</strong><br><img src="images/${b.img}" width="100"><br><a href="${b.page}" target="_blank">Open ${b.name}</a>`, "bot"));
+    else if (msg.includes("shop") || msg.includes("products")) productsList.forEach(p => addMessage(`<strong>${p.name}</strong><br>KSh ${p.salePrice.toLocaleString()}<br><img src="images/${p.images[0]}" width="100"><br>ID: ${p.id}`, "bot"));
+    else if (msg.startsWith("add ")) {
+      const productId = msg.replace("add ", "").trim();
+      addToCart(productId);
+      addMessage("✅ Product added to your cart.", "bot");
+    }
+    else if (msg.includes("cart")) {
+      if (!cart.length) { addMessage("Your cart is empty 🛒", "bot"); return; }
+      let total = 0; let cartText = "<strong>Your Cart:</strong><br>";
+      cart.forEach(item => { total += item.price * item.quantity; cartText += `${item.name} x${item.quantity} — KSh ${item.price * item.quantity}<br>`; });
+      cartText += `<br><strong>Total: KSh ${total}</strong>`;
+      addMessage(cartText, "bot");
+    }
+    else if (msg.includes("checkout")) {
+      if (!cart.length) { addMessage("Your cart is empty 🛒", "bot"); return; }
+      let text = "🛒 *New Order*%0A%0A"; let total = 0;
+      cart.forEach(item => { total += item.price * item.quantity; text += `• ${item.name} x${item.quantity} — KSh ${item.price * item.quantity}%0A`; });
+      text += `%0A*TOTAL: KSh ${total}*`;
+      window.open(`https://wa.me/254704222666?text=${text}`, "_blank");
+      addMessage("Opening WhatsApp for checkout 🟢", "bot");
+    }
+    else if (msg.includes("contact")) addMessage("📞 0704 222 666<br>📍 Ngong Road, Kiambu & Karen", "bot");
+    else if (msg.includes("booking")) addMessage("To book, type the service name or use the form above.", "bot");
+    else addMessage("Ask me about services, brands, shop, add [id], cart, checkout, booking or contact.", "bot");
+  }
 
-/* ---------- OPTION BUTTONS ---------- */
-optionButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    const option = btn.dataset.option;
-    addMessage(btn.textContent, "user");
-    botReply(option);
+  /* ---------- SEND MESSAGE ---------- */
+  send.addEventListener("click", () => {
+    const text = input.value.trim();
+    if (!text) return;
+    addMessage(text, "user");
+    botReply(text);
+    input.value = "";
   });
-});
 
-  
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") send.click();
+  });
+
+  /* ---------- OPTION BUTTONS ---------- */
+  optionButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const option = btn.dataset.option;
+      addMessage(btn.textContent, "user");
+      botReply(option);
+    });
+  });
+
+  /* ---------- PRODUCT CARD CLICK ---------- */
+  document.addEventListener("click", e => {
+    if (e.target.classList.contains("add-to-cart")) addToCart(e.target.dataset.id);
+  });
+
   /* ================= SMOOTH SCROLL ================= */
   document.querySelectorAll("nav a").forEach(link => {
     link.addEventListener("click", e => {
@@ -365,5 +309,18 @@ optionButtons.forEach(btn => {
       document.querySelector(link.getAttribute("href"))?.scrollIntoView({ behavior: "smooth" });
     });
   });
+
+  renderCart();
+
+  /* ================= TOAST ================= */
+  const toastContainer = document.createElement("div");
+  toastContainer.id = "toast";
+  document.body.appendChild(toastContainer);
+
+  function showToast(text) {
+    toastContainer.textContent = text;
+    toastContainer.classList.add("show");
+    setTimeout(() => toastContainer.classList.remove("show"), 2000);
+  }
 
 });
