@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div");
       card.className = "service-card";
       card.innerHTML = `
-        <img src="${s.img}" alt="${s.name}">
+        <img src="images/${s.img}" alt="${s.name}">
         <h3>${s.name}</h3>
         <p>${s.desc}</p>
       `;
@@ -99,29 +99,51 @@ document.addEventListener("DOMContentLoaded", () => {
     brands.forEach(b => {
       const card = document.createElement("div");
       card.className = "brand-card";
-      card.innerHTML = `<img src="${b.img}" alt="${b.name}"><p>${b.name}</p>`;
+      card.innerHTML = `<img src="images/${b.img}" alt="${b.name}"><p>${b.name}</p>`;
       card.style.cursor = "pointer";
       card.addEventListener("click", () => { window.location.href = b.page; });
       grid.appendChild(card);
     });
     brandsSection.appendChild(grid);
   }
-document.addEventListener("DOMContentLoaded", () => {
 
-  // ================= PRODUCTS & CART =================
-  let productsList = [
-    { id: 1, name: "Product A", salePrice: 1000 },
-    { id: 2, name: "Product B", salePrice: 2500 },
-    { id: 3, name: "Product C", salePrice: 1500 }
-  ]; // replace or fetch from products.json if needed
+  /* ================= PRODUCTS & CART ================= */
+  const shopGrid = document.querySelector("#shop .shop-grid");
+  let productsList = [];
 
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
   }
 
-  // ================= ADD TO CART =================
+  function renderShop() {
+    if (!shopGrid) return;
+    shopGrid.innerHTML = "";
+    productsList.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.innerHTML = `
+        <img src="images/${p.images[0]}" alt="${p.name}">
+        <h3>${p.name}</h3>
+        <p>KSh ${p.salePrice.toLocaleString()}</p>
+        <button onclick="addToCart('${p.id}')">Add to Cart</button>
+      `;
+      shopGrid.appendChild(card);
+    });
+  }
+
+  fetch("products.json")
+    .then(res => res.json())
+    .then(data => {
+      productsList = data;
+      renderShop();
+    })
+    .catch(err => {
+      console.error("Failed to load products:", err);
+      shopGrid.innerHTML = "<p>Failed to load products.</p>";
+    });
+
   function addToCart(productId) {
     const product = productsList.find(p => p.id === productId);
     if (!product) return alert("Product not found!");
@@ -134,7 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCart();
   }
 
-  // ================= RENDER CART =================
   function renderCart() {
     const cartItems = document.getElementById("cart-items");
     const cartTotal = document.getElementById("cart-total");
@@ -164,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()}`;
   }
 
-  // ================= CHANGE QTY =================
+  window.addToCart = addToCart;
   window.changeQty = function(id, amount) {
     const item = cart.find(i => i.id == id);
     if (!item) return;
@@ -174,38 +195,26 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCart();
   }
 
-  // ================= REMOVE ITEM =================
   window.removeItem = function(id) {
     cart = cart.filter(i => i.id != id);
     saveCart();
     renderCart();
   }
 
-  // ================= CHECKOUT =================
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
     if (!cart.length) return alert("Cart is empty!");
-
     let message = "🛒 *New Order*%0A%0A";
     let total = 0;
-
     cart.forEach(item => {
       const subtotal = item.price * item.quantity;
       total += subtotal;
       message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
     });
-
     message += `%0A*TOTAL: KSh ${total}*`;
     window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
   });
 
-  // ================= INITIAL RENDER =================
   renderCart();
-
-  // ================= EXPOSE ADD TO CART =================
-  window.addToCart = addToCart;
-
-});
-
 
   /* ================= BOOKING FORM ================= */
   const bookingForm = document.getElementById("bookingForm");
@@ -247,21 +256,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (msg.includes("hi") || msg.includes("hello")) addMessage("Hello 👋 How can I help you today?", "bot");
     else if (msg.includes("service")) {
-      servicesData.forEach(s => addMessage(`<strong>${s.name}</strong><br><img src="${s.img}" width="100"><br>${s.desc}`, "bot"));
+      servicesData.forEach(s => addMessage(`<strong>${s.name}</strong><br><img src="images/${s.img}" width="100"><br>${s.desc}`, "bot"));
     }
     else if (msg.includes("brand") || msg.includes("brands")) {
-      brands.forEach(b => addMessage(`<strong>${b.name}</strong><br><img src="${b.img}" width="100"><br>Click to open: <a href="${b.page}">${b.name} Page</a>`, "bot"));
+      brands.forEach(b => addMessage(`<strong>${b.name}</strong><br><img src="images/${b.img}" width="100"><br>Click to open: <a href="${b.page}">${b.name} Page</a>`, "bot"));
     }
     else if (msg.includes("shop") || msg.includes("products")) {
-      productsList.slice(0, 5).forEach(p => addMessage(`<strong>${p.name}</strong><br>KSh ${p.salePrice} — ID: ${p.id}`, "bot"));
+      productsList.forEach(p => addMessage(`<strong>${p.name}</strong><br>KSh ${p.salePrice.toLocaleString()}<br><img src="images/${p.images[0]}" width="100"><br>ID: ${p.id}`, "bot"));
     }
     else if (msg.includes("add")) {
-      const match = msg.match(/add (\d+)/);
+      const match = msg.match(/add (\S+)/);
       if (match) {
-        const productId = Number(match[1]);
+        const productId = match[1];
         addToCart(productId);
         addMessage("✅ Product added to your cart.", "bot");
-      } else addMessage("Please specify a product ID like: 'Add 3'", "bot");
+      } else addMessage("Please specify a product ID like: 'Add bmw-x6-f16-air-struts'", "bot");
     }
     else if (msg.includes("cart")) {
       if (!cart.length) return addMessage("Your cart is empty 🛒", "bot");
