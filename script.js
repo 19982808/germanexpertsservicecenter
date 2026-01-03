@@ -47,7 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= REVIEWS ================= */
   const reviews = document.querySelectorAll(".review");
   let reviewIndex = 0;
-
   if (reviews.length) {
     setInterval(() => {
       reviews.forEach(r => r.classList.remove("active"));
@@ -80,145 +79,135 @@ document.addEventListener("DOMContentLoaded", () => {
 
     brandsSection.appendChild(grid);
   }
-// ====================== GLOBAL CART ======================
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-function saveCart() {
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
+  /* ================= GLOBAL CART ================= */
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// ====================== LOAD PRODUCTS ======================
-fetch("products.json")
-  .then(res => res.json())
-  .then(products => renderShop(products))
-  .catch(err => console.error("Products load error:", err));
+  function saveCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
 
-function renderShop(products) {
-  const shopGrid = document.querySelector(".shop-grid");
-  if (!shopGrid) return;
-
-  shopGrid.innerHTML = "";
-
-  products.forEach(p => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.innerHTML = `
-      <img src="images/${p.images[0]}" alt="${p.name}">
-      <h3>${p.name}</h3>
-      <p>KSh ${p.salePrice.toLocaleString()}</p>
-      <button onclick="addToCart(${p.id})">Add to Cart</button>
-      <button onclick="addToCartFromChat('${p.id}')">💬 Chatbot Add</button>
-    `;
-    shopGrid.appendChild(card);
-  });
-}
-
-// ====================== ADD TO CART ======================
-function addToCart(productId) {
+  /* ================= LOAD PRODUCTS ================= */
+  let productsList = [];
   fetch("products.json")
     .then(res => res.json())
     .then(products => {
-      const product = products.find(p => p.id === productId);
-      if (!product) return;
-
-      const existing = cart.find(i => i.id === product.id);
-      if (existing) {
-        existing.quantity += 1;
-      } else {
-        cart.push({
-          id: product.id,
-          name: product.name,
-          price: product.salePrice,
-          image: product.images[0],
-          quantity: 1
-        });
-      }
-      saveCart();
+      productsList = products;
+      renderShop(productsList);
       renderCart();
+    })
+    .catch(err => console.error("Products load error:", err));
+
+  function renderShop(products) {
+    const shopGrid = document.querySelector(".shop-grid");
+    if (!shopGrid) return;
+
+    shopGrid.innerHTML = "";
+
+    products.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.innerHTML = `
+        <img src="images/${p.images[0]}" alt="${p.name}">
+        <h3>${p.name}</h3>
+        <p>KSh ${p.salePrice.toLocaleString()}</p>
+        <button onclick="addToCart(${p.id})">Add to Cart</button>
+        <button onclick="addToCartFromChat('${p.id}')">💬 Chatbot Add</button>
+      `;
+      shopGrid.appendChild(card);
     });
-}
+  }
 
-// ====================== CART RENDER ======================
-function renderCart() {
-  const cartItems = document.getElementById("cart-items");
-  const cartTotal = document.getElementById("cart-total");
-  if (!cartItems || !cartTotal) return;
+  /* ================= ADD TO CART ================= */
+  window.addToCart = function(productId) {
+    const product = productsList.find(p => p.id == productId);
+    if (!product) return;
 
-  cartItems.innerHTML = "";
-  let total = 0;
+    const existing = cart.find(i => i.id == product.id);
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.salePrice,
+        image: product.images[0],
+        quantity: 1
+      });
+    }
+    saveCart();
+    renderCart();
+  };
 
-  cart.forEach(item => {
-    const subtotal = item.price * item.quantity;
-    total += subtotal;
+  window.addToCartFromChat = function(productId) {
+    addToCart(productId);
+  };
 
-    cartItems.innerHTML += `
-      <div class="cart-item">
-        <img src="images/${item.image}" width="50">
-        <strong>${item.name}</strong>
-        <div class="qty">
-          <button onclick="changeQty('${item.id}', -1)">−</button>
-          <span>${item.quantity}</span>
-          <button onclick="changeQty('${item.id}', 1)">+</button>
+  /* ================= RENDER CART ================= */
+  function renderCart() {
+    const cartItems = document.getElementById("cart-items");
+    const cartTotal = document.getElementById("cart-total");
+    if (!cartItems || !cartTotal) return;
+
+    cartItems.innerHTML = "";
+    let total = 0;
+
+    cart.forEach(item => {
+      const subtotal = item.price * item.quantity;
+      total += subtotal;
+
+      cartItems.innerHTML += `
+        <div class="cart-item">
+          <img src="images/${item.image}" width="50">
+          <strong>${item.name}</strong>
+          <div class="qty">
+            <button onclick="changeQty('${item.id}', -1)">−</button>
+            <span>${item.quantity}</span>
+            <button onclick="changeQty('${item.id}', 1)">+</button>
+          </div>
+          <span>KSh ${subtotal.toLocaleString()}</span>
+          <button onclick="removeItem('${item.id}')">🗑</button>
         </div>
-        <span>KSh ${subtotal.toLocaleString()}</span>
-        <button onclick="removeItem('${item.id}')">🗑</button>
-      </div>
-    `;
-  });
-
-  cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()}`;
-}
-
-// ====================== CART FUNCTIONS ======================
-function changeQty(id, amount) {
-  const item = cart.find(i => i.id === id);
-  if (!item) return;
-
-  item.quantity += amount;
-  if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
-
-  saveCart();
-  renderCart();
-}
-
-function removeItem(id) {
-  cart = cart.filter(i => i.id !== id);
-  saveCart();
-  renderCart();
-}
-
-// ====================== WHATSAPP CHECKOUT ======================
-document.getElementById("checkoutBtn")?.addEventListener("click", () => {
-  if (cart.length === 0) return alert("Cart is empty!");
-
-  let message = "🛒 *New Order*%0A%0A";
-  let total = 0;
-
-  cart.forEach(item => {
-    const subtotal = item.price * item.quantity;
-    total += subtotal;
-    message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
-  });
-
-  message += `%0A*TOTAL: KSh ${total}*`;
-  window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
-});
-
-// ====================== CHATBOT ADD TO CART ======================
-function addToCartFromChat(productId) {
-  fetch("products.json")
-    .then(res => res.json())
-    .then(products => {
-      const product = products.find(p => p.id === productId);
-      if (product) addToCart(product.id);
+      `;
     });
-}
 
-// ====================== INITIALIZE ======================
-document.addEventListener("DOMContentLoaded", () => {
-  renderCart(); // show cart on page load
-});
+    cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()}`;
+  }
 
+  /* ================= CART FUNCTIONS ================= */
+  window.changeQty = function(id, amount) {
+    const item = cart.find(i => i.id == id);
+    if (!item) return;
+
+    item.quantity += amount;
+    if (item.quantity <= 0) cart = cart.filter(i => i.id != id);
+
+    saveCart();
+    renderCart();
+  };
+
+  window.removeItem = function(id) {
+    cart = cart.filter(i => i.id != id);
+    saveCart();
+    renderCart();
+  };
+
+  /* ================= WHATSAPP CHECKOUT ================= */
+  document.getElementById("checkoutBtn")?.addEventListener("click", () => {
+    if (cart.length === 0) return alert("Cart is empty!");
+
+    let message = "🛒 *New Order*%0A%0A";
+    let total = 0;
+
+    cart.forEach(item => {
+      const subtotal = item.price * item.quantity;
+      total += subtotal;
+      message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
+    });
+
+    message += `%0A*TOTAL: KSh ${total}*`;
+    window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
+  });
 
   /* ================= BOOKING → WHATSAPP ================= */
   const bookingForm = document.getElementById("bookingForm");
@@ -226,75 +215,156 @@ document.addEventListener("DOMContentLoaded", () => {
 
   bookingForm?.addEventListener("submit", e => {
     e.preventDefault();
-
     const text = encodeURIComponent(
       `Booking Request\nName: ${name.value}\nPhone: ${phone.value}\nService: ${service.value}\nMessage: ${message.value}`
     );
-
     popup.style.display = "block";
-
     setTimeout(() => {
       window.open(`https://wa.me/254704222666?text=${text}`, "_blank");
       popup.style.display = "none";
       bookingForm.reset();
     }, 1000);
   });
+/* ================= CHATBOT FRANCO SMART ================= */
+const chatBox = document.getElementById("chatbot-container");
+const toggle = document.getElementById("chatbot-toggle");
+const close = document.getElementById("chatbot-close");
+const messages = document.getElementById("chatbot-messages");
+const input = document.getElementById("chatbot-input");
+const send = document.getElementById("chatbot-send");
 
-  /* ================= CHATBOT ================= */
-  const chatBox = document.getElementById("chatbot-container");
-  const toggle = document.getElementById("chatbot-toggle");
-  const close = document.getElementById("chatbot-close");
-  const messages = document.getElementById("chatbot-messages");
-  const input = document.getElementById("chatbot-input");
-  const send = document.getElementById("chatbot-send");
+toggle.onclick = () => chatBox.style.display = "flex";
+close.onclick = () => chatBox.style.display = "none";
 
-  toggle.onclick = () => chatBox.style.display = "flex";
-  close.onclick = () => chatBox.style.display = "none";
-
-  function addMessage(text, type) {
-    const div = document.createElement("div");
-    div.className = `message ${type}`;
-    div.innerHTML = text;
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  function botReply(msg) {
-    msg = msg.toLowerCase();
-    if (msg.includes("hi")) addMessage("Hello 👋 How can I help?", "bot");
-    else if (msg.includes("service")) addMessage("We offer engine, diagnostics, suspension & more.", "bot");
-    else if (msg.includes("contact")) addMessage("📞 0704 222 666", "bot");
-    else if (msg.includes("location")) addMessage("📍 Ngong Road & Karen", "bot");
-    else addMessage("Ask about services, booking, location or shop.", "bot");
-  }
-
-  send.onclick = () => {
-    if (!input.value.trim()) return;
-    addMessage(input.value, "user");
-    botReply(input.value);
-    input.value = "";
-  };
-
-  input.addEventListener("keypress", e => {
-    if (e.key === "Enter") send.click();
-  });
-function showProductsInChat() {
-  fetch("products.json")
-    .then(r => r.json())
-    .then(products => {
-      const box = document.getElementById("chatbot-messages");
-
-      products.slice(0,3).forEach(p => {
-        box.innerHTML += `
-          <div class="bot-message">
-            <img src="${p.images[0]}" style="width:100%;border-radius:8px">
-            <strong>${p.name}</strong><br>
-            KSh ${p.salePrice}
-          </div>
-        `;
-      });
-    });
+// Chat message creator
+function addMessage(text, type = "bot") {
+  const div = document.createElement("div");
+  div.className = `message ${type}`;
+  div.innerHTML = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
 }
+
+// Fetch products globally for Franco
+let productsList = [];
+fetch("products.json")
+  .then(r => r.json())
+  .then(data => productsList = data);
+
+// Fetch brands
+const brands = [
+  { name: "Audi", img: "audi.png" },
+  { name: "BMW", img: "bmw.png" },
+  { name: "Mercedes", img: "mercedes-benz.png" },
+  { name: "Volkswagen", img: "volkswagen.png" },
+  { name: "Porsche", img: "porsche.png" },
+  { name: "Range Rover", img: "range-rover.png" }
+];
+
+// Franco reply
+function francoReply(msg) {
+  msg = msg.toLowerCase();
+
+  if (msg.includes("hi") || msg.includes("hello")) {
+    addMessage("Hello 👋! I’m Franco, your smart assistant. Ask me about services, products, brands, booking, locations, or your cart.", "bot");
+  }
+  else if (msg.includes("services")) {
+    const serviceSection = document.getElementById("services");
+    serviceSection?.scrollIntoView({behavior: "smooth"});
+    addMessage("Here are our services. Click to expand:", "bot");
+
+    document.querySelectorAll("#services .service-card").forEach((card, idx) => {
+      const name = card.querySelector("h3").textContent;
+      const desc = card.querySelector("p").textContent;
+      addMessage(`
+        <div class="chat-service" data-idx="${idx}">
+          <strong>${name}</strong> <button onclick="toggleService(${idx})">🔍</button>
+          <p id="service-desc-${idx}" style="display:none">${desc}</p>
+        </div>
+      `, "bot");
+    });
+  }
+  else if (msg.includes("products") || msg.includes("shop")) {
+    const shopSection = document.getElementById("shop");
+    shopSection?.scrollIntoView({behavior: "smooth"});
+    addMessage("Here are some products. Click 'Add to Cart' to buy:", "bot");
+
+    productsList.slice(0, 5).forEach(p => {
+      addMessage(`
+        <div class="chat-product">
+          <img src="images/${p.images[0]}" style="width:100px; border-radius:6px; cursor:pointer" onclick="scrollToProduct(${p.id})"><br>
+          <strong>${p.name}</strong><br>
+          ${p.description || ""}<br>
+          KSh ${p.salePrice.toLocaleString()}<br>
+          <button onclick="addToCart(${p.id})">Add to Cart 🛒</button>
+        </div>
+      `, "bot");
+    });
+  }
+  else if (msg.includes("brands")) {
+    const brandSection = document.getElementById("brands");
+    brandSection?.scrollIntoView({behavior: "smooth"});
+    addMessage("We specialize in these brands. Click to view:", "bot");
+    brands.forEach((b, idx) => addMessage(`<img src="${b.img}" style="width:80px; cursor:pointer" onclick="scrollToBrand(${idx})"><br>${b.name}`, "bot"));
+  }
+  else if (msg.includes("locations")) {
+    const locSection = document.getElementById("locations");
+    locSection?.scrollIntoView({behavior: "smooth"});
+    addMessage("Our branches are located here:", "bot");
+    addMessage("📍 Ngong Road, Kiambu By-pass & Karen", "bot");
+  }
+  else if (msg.includes("booking") || msg.includes("appointment")) {
+    const bookingSection = document.getElementById("booking");
+    bookingSection?.scrollIntoView({behavior: "smooth"});
+    addMessage("You can book an appointment here. Fill the form and we’ll confirm via WhatsApp.", "bot");
+  }
+  else if (msg.includes("cart") || msg.includes("checkout")) {
+    const shopSection = document.getElementById("shop");
+    shopSection?.scrollIntoView({behavior: "smooth"});
+    addMessage("Here’s your cart. Adjust quantities, remove items, or checkout via WhatsApp.", "bot");
+    renderCart(); // show live cart
+  }
+  else {
+    addMessage("I can help you navigate the site: services, products, brands, booking, locations, or cart.", "bot");
+  }
+}
+
+// Toggle service descriptions
+window.toggleService = function(idx) {
+  const desc = document.getElementById(`service-desc-${idx}`);
+  if (desc) desc.style.display = desc.style.display === "none" ? "block" : "none";
+};
+
+// Scroll to product in shop
+window.scrollToProduct = function(id) {
+  const shopSection = document.getElementById("shop");
+  const productCard = Array.from(shopSection.querySelectorAll(".product-card")).find(c => c.querySelector("button")?.onclick.toString().includes(`addToCart(${id})`));
+  productCard?.scrollIntoView({behavior: "smooth"});
+  addMessage(`Scrolled to product <strong>${productCard.querySelector("h3").textContent}</strong>`, "bot");
+};
+
+// Scroll to brand
+window.scrollToBrand = function(idx) {
+  const brandSection = document.getElementById("brands");
+  const brandCard = brandSection.querySelectorAll(".brand-card")[idx];
+  brandCard?.scrollIntoView({behavior: "smooth"});
+  addMessage(`Scrolled to brand <strong>${brands[idx].name}</strong>`, "bot");
+};
+
+// Send message
+send.onclick = () => {
+  if (!input.value.trim()) return;
+  addMessage(input.value, "user");
+  francoReply(input.value);
+  input.value = "";
+};
+
+// Enter key sends
+input.addEventListener("keypress", e => {
+  if (e.key === "Enter") send.click();
+});
+
+  
 
   /* ================= SMOOTH SCROLL ================= */
   document.querySelectorAll("nav a").forEach(link => {
