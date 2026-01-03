@@ -80,47 +80,145 @@ document.addEventListener("DOMContentLoaded", () => {
 
     brandsSection.appendChild(grid);
   }
- /* ================= CART ================= */
-  function loadCart() {
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const container = document.getElementById("cartItems");
-  const totalEl = document.getElementById("cartTotal");
+// ====================== GLOBAL CART ======================
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  if (!container) return;
+function saveCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
 
-  container.innerHTML = "";
+// ====================== LOAD PRODUCTS ======================
+fetch("products.json")
+  .then(res => res.json())
+  .then(products => renderShop(products))
+  .catch(err => console.error("Products load error:", err));
+
+function renderShop(products) {
+  const shopGrid = document.querySelector(".shop-grid");
+  if (!shopGrid) return;
+
+  shopGrid.innerHTML = "";
+
+  products.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <img src="images/${p.images[0]}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>KSh ${p.salePrice.toLocaleString()}</p>
+      <button onclick="addToCart(${p.id})">Add to Cart</button>
+      <button onclick="addToCartFromChat('${p.id}')">💬 Chatbot Add</button>
+    `;
+    shopGrid.appendChild(card);
+  });
+}
+
+// ====================== ADD TO CART ======================
+function addToCart(productId) {
+  fetch("products.json")
+    .then(res => res.json())
+    .then(products => {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+
+      const existing = cart.find(i => i.id === product.id);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({
+          id: product.id,
+          name: product.name,
+          price: product.salePrice,
+          image: product.images[0],
+          quantity: 1
+        });
+      }
+      saveCart();
+      renderCart();
+    });
+}
+
+// ====================== CART RENDER ======================
+function renderCart() {
+  const cartItems = document.getElementById("cart-items");
+  const cartTotal = document.getElementById("cart-total");
+  if (!cartItems || !cartTotal) return;
+
+  cartItems.innerHTML = "";
   let total = 0;
 
-  cart.forEach((p, i) => {
-    total += p.salePrice * p.qty;
-    container.innerHTML += `
-      <div>
-        ${p.name} × ${p.qty} — KSh ${p.salePrice * p.qty}
+  cart.forEach(item => {
+    const subtotal = item.price * item.quantity;
+    total += subtotal;
+
+    cartItems.innerHTML += `
+      <div class="cart-item">
+        <img src="images/${item.image}" width="50">
+        <strong>${item.name}</strong>
+        <div class="qty">
+          <button onclick="changeQty('${item.id}', -1)">−</button>
+          <span>${item.quantity}</span>
+          <button onclick="changeQty('${item.id}', 1)">+</button>
+        </div>
+        <span>KSh ${subtotal.toLocaleString()}</span>
+        <button onclick="removeItem('${item.id}')">🗑</button>
       </div>
     `;
   });
 
-  totalEl.textContent = `TOTAL: KSh ${total}`;
+  cartTotal.textContent = `TOTAL: KSh ${total.toLocaleString()}`;
 }
 
-loadCart();
-document.getElementById('checkout-btn')?.addEventListener('click', () => {
-  if (!cart.length) {
-    alert('Your cart is empty');
-    return;
-  }
+// ====================== CART FUNCTIONS ======================
+function changeQty(id, amount) {
+  const item = cart.find(i => i.id === id);
+  if (!item) return;
 
-  let message = '🛒 *New Order*%0A%0A';
+  item.quantity += amount;
+  if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
+
+  saveCart();
+  renderCart();
+}
+
+function removeItem(id) {
+  cart = cart.filter(i => i.id !== id);
+  saveCart();
+  renderCart();
+}
+
+// ====================== WHATSAPP CHECKOUT ======================
+document.getElementById("checkoutBtn")?.addEventListener("click", () => {
+  if (cart.length === 0) return alert("Cart is empty!");
+
+  let message = "🛒 *New Order*%0A%0A";
+  let total = 0;
 
   cart.forEach(item => {
-    message += `${item.name} × ${item.quantity} — KSh ${(item.price * item.quantity).toLocaleString()}%0A`;
+    const subtotal = item.price * item.quantity;
+    total += subtotal;
+    message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
   });
 
-  const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  message += `%0A*TOTAL: KSh ${total.toLocaleString()}*`;
-
-  window.open(`https://wa.me/254704222666?text=${message}`, '_blank');
+  message += `%0A*TOTAL: KSh ${total}*`;
+  window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
 });
+
+// ====================== CHATBOT ADD TO CART ======================
+function addToCartFromChat(productId) {
+  fetch("products.json")
+    .then(res => res.json())
+    .then(products => {
+      const product = products.find(p => p.id === productId);
+      if (product) addToCart(product.id);
+    });
+}
+
+// ====================== INITIALIZE ======================
+document.addEventListener("DOMContentLoaded", () => {
+  renderCart(); // show cart on page load
+});
+
 
   /* ================= BOOKING → WHATSAPP ================= */
   const bookingForm = document.getElementById("bookingForm");
