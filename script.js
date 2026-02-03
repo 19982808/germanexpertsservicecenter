@@ -1,4 +1,4 @@
-", () => {
+document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= HERO SLIDER ================= */
   const slides = document.querySelectorAll(".slide");
@@ -282,11 +282,30 @@
   input.addEventListener("keydown", e => { if (e.key === "Enter") send.click(); });
 
   optionButtons.forEach(btn => { btn.addEventListener("click", () => { addMessage(btn.textContent, "user"); botReply(btn.dataset.option); }); });
-
   document.addEventListener("click", e => { if (e.target.classList.contains("add-to-cart")) addToCart(e.target.dataset.id); });
 
-  /* ================= SMOOTH SCROLL ================= */
-  document.querySelectorAll("nav a").forEach(link => { link.addEventListener("click", e => { e.preventDefault(); document.querySelector(link.getAttribute("href"))?.scrollIntoView({ behavior: "smooth" }); }); });
+  /* ================= SMOOTH SCROLL & SECTION TOGGLE ================= */
+  const allSections = document.querySelectorAll("section");
+  document.querySelectorAll("nav a").forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      const targetId = link.getAttribute("href").replace("#", "");
+      const targetSection = document.getElementById(targetId);
+      if(!targetSection) return;
+
+      // Hide all sections
+      allSections.forEach(sec => sec.style.display = "none");
+
+      // Show target section
+      targetSection.style.display = "block";
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
+  // Show first section on load
+  if(allSections.length) allSections[0].style.display = "block";
 
   /* ================= TOAST ================= */
   const toastContainer = document.createElement("div");
@@ -298,7 +317,5 @@
     toastContainer.classList.add("show");
     setTimeout(() => toastContainer.classList.remove("show"), 2000);
   }
-
-  renderCart();
 
 });
