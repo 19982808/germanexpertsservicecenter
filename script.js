@@ -112,25 +112,15 @@ document.addEventListener("DOMContentLoaded", () => {
   let productsList = [];
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  function saveCart() {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }
+  function saveCart() { localStorage.setItem("cart", JSON.stringify(cart)); }
 
   function addToCart(productId) {
-    const product = productsList.find(p => p.id === productId);
-    if (!product) {
-      showToast("❌ Product not found");
-      return;
-    }
+    const product = productsList.find(p => p.id == productId);
+    if (!product) { showToast("❌ Product not found"); return; }
 
-    const existing = cart.find(i => i.id === productId);
+    const existing = cart.find(i => i.id == productId);
     if (existing) existing.quantity += 1;
-    else cart.push({
-      id: product.id,
-      name: product.name || "Unnamed Product",
-      price: Number(product.salePrice) || 0,
-      quantity: 1
-    });
+    else cart.push({ id: product.id, name: product.name, price: Number(product.salePrice), quantity: 1 });
 
     saveCart();
     renderCart();
@@ -155,14 +145,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fetch("products.json")
     .then(res => res.json())
-    .then(data => {
-      productsList = data;
-      renderShop();
-    })
-    .catch(err => {
-      console.error("Failed to load products:", err);
-      shopGrid.innerHTML = "<p>Failed to load products.</p>";
-    });
+    .then(data => { productsList = data; renderShop(); })
+    .catch(err => { console.error("Failed to load products:", err); shopGrid.innerHTML = "<p>Failed to load products.</p>"; });
 
   function renderCart() {
     const cartItems = document.getElementById("cart-items");
@@ -170,20 +154,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!cartItems || !cartTotal) return;
 
     if (!cart.length) {
-      cartItems.innerHTML = "";
-      cartTotal.textContent = "KSh 0";
+      cartItems.innerHTML = "<p>Your cart is empty.</p>";
+      cartTotal.textContent = "TOTAL: KSh 0";
       return;
     }
 
-    cartItems.innerHTML = "";
     let total = 0;
-
+    cartItems.innerHTML = "";
     cart.forEach(item => {
-      if (!item.id || !item.name || isNaN(item.price) || !item.quantity) return;
-
       const subtotal = item.price * item.quantity;
       total += subtotal;
-
       cartItems.innerHTML += `
         <div class="cart-item">
           <strong>${item.name}</strong>
@@ -220,16 +200,66 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!cart.length) return alert("Cart is empty!");
     let message = "🛒 *New Order*%0A%0A";
     let total = 0;
-    cart.forEach(item => {
-      const subtotal = item.price * item.quantity;
-      total += subtotal;
-      message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`;
-    });
+    cart.forEach(item => { const subtotal = item.price * item.quantity; total += subtotal; message += `• ${item.name} x${item.quantity} — KSh ${subtotal}%0A`; });
     message += `%0A*TOTAL: KSh ${total}*`;
     window.open(`https://wa.me/254704222666?text=${message}`, "_blank");
   });
 
   renderCart();
+
+  /* ================= BOOKING FORM ================= */
+  const bookingForm = document.getElementById("bookingForm");
+  const confirmationPopup = document.getElementById("confirmationPopup");
+  bookingForm?.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const service = document.getElementById("service").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    if (!name || !phone || !service) return alert("Please fill all required fields");
+
+    const text = `📅 *Booking Request*%0A%0AName: ${name}%0APhone: ${phone}%0AService: ${service}%0AMessage: ${message}`;
+    confirmationPopup.classList.add("show");
+    window.open(`https://wa.me/254704222666?text=${text}`, "_blank");
+    setTimeout(() => confirmationPopup.classList.remove("show"), 3000);
+  });
+
+  /* ================= SMOOTH SCROLL WITH HEADER OFFSET ================= */
+  function getHeaderOffset() { const header = document.querySelector("header"); return header ? header.offsetHeight : 0; }
+
+  document.querySelectorAll("nav a").forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute("href"));
+      if (!target) return;
+      const headerOffset = getHeaderOffset();
+      const elementPosition = target.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - headerOffset;
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+    });
+  });
+
+  if (window.location.hash) {
+    const target = document.querySelector(window.location.hash);
+    if (target) {
+      setTimeout(() => {
+        const headerOffset = getHeaderOffset();
+        const elementPosition = target.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({ top: elementPosition - headerOffset, behavior: "smooth" });
+      }, 100);
+    }
+  }
+
+  /* ================= TOAST ================= */
+  const toastContainer = document.createElement("div");
+  toastContainer.id = "toast";
+  document.body.appendChild(toastContainer);
+  function showToast(text) {
+    toastContainer.textContent = text;
+    toastContainer.classList.add("show");
+    setTimeout(() => toastContainer.classList.remove("show"), 2000);
+  }
 
   /* ================= CHATBOT ================= */
   const chatBox = document.getElementById("chatbot-container");
@@ -261,7 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (msg.includes("cart")) { 
       if (!cart.length) { addMessage("Your cart is empty 🛒", "bot"); return; }
       let total = 0, cartText = "<strong>Your Cart:</strong><br>";
-      cart.forEach(item => { if (!item.id || !item.name) return; total += item.price * item.quantity; cartText += `${item.name} x${item.quantity} — KSh ${item.price * item.quantity}<br>`; });
+      cart.forEach(item => { total += item.price * item.quantity; cartText += `${item.name} x${item.quantity} — KSh ${item.price * item.quantity}<br>`; });
       cartText += `<br><strong>Total: KSh ${total}</strong>`;
       addMessage(cartText, "bot");
     }
@@ -274,48 +304,15 @@ document.addEventListener("DOMContentLoaded", () => {
       addMessage("Opening WhatsApp for checkout 🟢", "bot");
     }
     else if (msg.includes("contact")) addMessage("📞 0704 222 666<br>📍 Ngong Road, Kiambu & Karen", "bot");
-    else if (msg.includes("booking")) addMessage("To book, type the service name or use the form above.", "bot");
+    else if (msg.includes("booking")) addMessage("To book, type the service name or use the booking form above.", "bot");
     else addMessage("Ask me about services, brands, shop, add [id], cart, checkout, booking or contact.", "bot");
   }
 
   send.addEventListener("click", () => { const text = input.value.trim(); if (!text) return; addMessage(text, "user"); botReply(text); input.value = ""; });
   input.addEventListener("keydown", e => { if (e.key === "Enter") send.click(); });
-
   optionButtons.forEach(btn => { btn.addEventListener("click", () => { addMessage(btn.textContent, "user"); botReply(btn.dataset.option); }); });
   document.addEventListener("click", e => { if (e.target.classList.contains("add-to-cart")) addToCart(e.target.dataset.id); });
 
-  /* ================= SMOOTH SCROLL & SECTION TOGGLE ================= */
-  const allSections = document.querySelectorAll("section");
-  document.querySelectorAll("nav a").forEach(link => {
-    link.addEventListener("click", e => {
-      e.preventDefault();
-      const targetId = link.getAttribute("href").replace("#", "");
-      const targetSection = document.getElementById(targetId);
-      if(!targetSection) return;
-
-      // Hide all sections
-      allSections.forEach(sec => sec.style.display = "none");
-
-      // Show target section
-      targetSection.style.display = "block";
-
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  });
-
-  // Show first section on load
-  if(allSections.length) allSections[0].style.display = "block";
-
-  /* ================= TOAST ================= */
-  const toastContainer = document.createElement("div");
-  toastContainer.id = "toast";
-  document.body.appendChild(toastContainer);
-
-  function showToast(text) {
-    toastContainer.textContent = text;
-    toastContainer.classList.add("show");
-    setTimeout(() => toastContainer.classList.remove("show"), 2000);
-  }
-
 });
+
+      
