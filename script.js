@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+", () => {
 
   /* ================= HERO SLIDER ================= */
   const slides = document.querySelectorAll(".slide");
