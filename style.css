@@ -43,7 +43,7 @@ header .logo {
 
 header nav {
   display: flex;
-  gap: 25px;
+  gap: 15px;
 }
 
 header nav a {
