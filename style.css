@@ -36,9 +36,9 @@ header {
 }
 
 header .logo {
-  max-height: 250px;
-  width: 300px;
-  display: block;
+  max-height: 50px;
+  width: 400px;
+  
 }
 
 header nav {
